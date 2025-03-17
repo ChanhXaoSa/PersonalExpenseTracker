@@ -32,6 +32,18 @@ namespace ExpenseManager.Presenters
             UpdateView();
         }
 
+        public void AddExpense(Expense expense)
+        {
+            if (string.IsNullOrEmpty(expense.Description) || expense.Amount <= 0)
+            {
+                view.ShowMessage("Vui lòng nhập đầy đủ và hợp lệ!");
+                return;
+            }
+
+            model.AddExpense(expense);
+            UpdateView();
+        }
+
         public void DeleteExpense(int id)
         {
             model.DeleteExpense(id);
