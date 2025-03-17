@@ -35,6 +35,8 @@
             btnAdd = new Button();
             dgvExpenses = new DataGridView();
             lblTotal = new Label();
+            btnEdit = new Button();
+            btnDelete = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvExpenses).BeginInit();
             SuspendLayout();
             // 
@@ -84,7 +86,7 @@
             dgvExpenses.Location = new Point(390, 72);
             dgvExpenses.Name = "dgvExpenses";
             dgvExpenses.RowHeadersWidth = 51;
-            dgvExpenses.Size = new Size(300, 188);
+            dgvExpenses.Size = new Size(375, 188);
             dgvExpenses.TabIndex = 5;
             // 
             // lblTotal
@@ -95,11 +97,33 @@
             lblTotal.Size = new Size(0, 20);
             lblTotal.TabIndex = 6;
             // 
+            // btnEdit
+            // 
+            btnEdit.Location = new Point(390, 37);
+            btnEdit.Name = "btnEdit";
+            btnEdit.Size = new Size(94, 29);
+            btnEdit.TabIndex = 8;
+            btnEdit.Text = "Sửa";
+            btnEdit.UseVisualStyleBackColor = true;
+            btnEdit.Click += BtnEdit_Click;
+            // 
+            // btnDelete
+            // 
+            btnDelete.Location = new Point(490, 37);
+            btnDelete.Name = "btnDelete";
+            btnDelete.Size = new Size(94, 29);
+            btnDelete.TabIndex = 9;
+            btnDelete.Text = "Xoá";
+            btnDelete.UseVisualStyleBackColor = true;
+            btnDelete.Click += BtnDelete_Click;
+            // 
             // ExpenseView
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(828, 675);
+            Controls.Add(btnDelete);
+            Controls.Add(btnEdit);
             Controls.Add(lblTotal);
             Controls.Add(dgvExpenses);
             Controls.Add(btnAdd);
@@ -123,5 +147,7 @@
         private Button btnAdd;
         private DataGridView dgvExpenses;
         private Label lblTotal;
+        private Button btnEdit;
+        private Button btnDelete;
     }
 }

@@ -32,10 +32,35 @@ namespace ExpenseManager.Presenters
             UpdateView();
         }
 
-        private void UpdateView()
+        public void DeleteExpense(int id)
         {
-            view.UpdateExpenseList(model.GetExpenses());
-            view.UpdateTotal(model.GetTotalExpenses());
+            model.DeleteExpense(id);
+            UpdateView();
+        }
+
+        public void EditExpense(Expense expense)
+        {
+            if(string.IsNullOrEmpty(expense.Description) || expense.Amount <= 0)
+            {
+                view.ShowMessage("Vui lòng nhập đầy đủ và hợp lệ!");
+                return;
+            }
+            model.UpdateExpense(expense);
+            UpdateView();
+        }
+
+        public void UpdateView()
+        {
+            view.UpdateExpenseList(model.GetAllExpenses());
+            view.UpdateTotal(model.GetTotalExpense());
+            var expensesByCategory = model.GetExpensesByCategory();
+            if(expensesByCategory.Count > 0)
+            {
+                view.UpdateChart(expensesByCategory);
+            } else
+            {
+                view.UpdateChart(new Dictionary<string, decimal> { { "Không có dữ liệu", 1m } });
+            }
         }
     }
 }
