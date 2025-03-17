@@ -1,22 +1,30 @@
 ﻿using ExpenseManager.Models;
 using ExpenseManager.Presenters;
-using Guna.Charts.WinForms;
+using ScottPlot;
+using System.Drawing;
 
 namespace ExpenseManager
 {
     public partial class ExpenseView : Form, IExpenseView
     {
         private readonly ExpensePresenter presenter;
-        private readonly GunaChart chartExpenses;
+        private readonly PictureBox chartPictureBox;
+        private readonly Plot chartPlot;
         public ExpenseView()
         {
             InitializeComponent();
-            chartExpenses = new GunaChart
+
+            chartPictureBox = new PictureBox
             {
-                Location = new Point(50, 300),
-                Size= new Size(500, 300)
+                Location = new Point(15, 250),
+                Size = new Size(700, 300),
+                BorderStyle = BorderStyle.FixedSingle
             };
-            this.Controls.Add(chartExpenses);
+            this.Controls.Add(chartPictureBox);
+
+            chartPlot = new Plot();
+
+
             presenter = new ExpensePresenter(this, new ExpenseModel());
             LoadCategories();
             btnAdd.Click += (s, e) =>
@@ -58,20 +66,34 @@ namespace ExpenseManager
 
         public void UpdateChart(Dictionary<string, decimal> expensesByCategory)
         {
-            chartExpenses.Datasets.Clear();
+            chartPlot.Clear();
 
-            var dataset = new GunaPieDataset
-            {
-                Label = "Chi tiêu theo loại",
-                BorderWidth = 1,
-            };
+            double[] values = expensesByCategory.Values.Select(c => (double)c).ToArray();
+            string[] labels = [.. expensesByCategory.Keys];
+            ScottPlot.Color[] colors = expensesByCategory.Values.Select(_ => ScottPlot.Color.RandomHue()).ToArray();
 
-            foreach (var category in expensesByCategory)
+            var pie = chartPlot.Add.Pie(values);
+            //pie.ExplodeFraction = 0.1;
+            //pie.SliceLabelDistance = 1.4;
+            pie.DonutFraction = .5;
+
+            double total = pie.Slices.Select(x => x.Value).Sum();
+            for (int i = 0; i < pie.Slices.Count; i++)
             {
-                dataset.DataPoints.Add(new LPoint { Label = category.Key, Y = (double)category.Value });
+                pie.Slices[i].Label = $"{labels[i]}";
+                pie.Slices[i].LegendText = $"{pie.Slices[i].Label}: {pie.Slices[i].Value:C} " +
+                $"({pie.Slices[i].Value / total:p1})";
             }
 
-            chartExpenses.Datasets.Add(dataset);
+            chartPlot.ShowLegend(Alignment.UpperRight);
+
+            chartPlot.Axes.Frameless();
+            chartPlot.Grid.IsVisible = false;
+
+            chartPictureBox.Image?.Dispose();
+            using var scottImage = chartPlot.GetImage(chartPictureBox.Width, chartPictureBox.Height);
+            using var stream = new MemoryStream(scottImage.GetImageBytes());
+            chartPictureBox.Image = System.Drawing.Image.FromStream(stream);
         }
 
         private void BtnEdit_Click(object sender, EventArgs e)
