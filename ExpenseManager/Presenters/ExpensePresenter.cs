@@ -10,7 +10,7 @@ namespace ExpenseManager.Presenters
     public class ExpensePresenter(IExpenseView view, ExpenseModel model)
     {
         private readonly IExpenseView view = view;
-        private readonly ExpenseModel model = model;
+        public ExpenseModel model = model;
 
         public void AddExpense()
         {
