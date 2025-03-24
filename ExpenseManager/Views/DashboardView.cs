@@ -18,9 +18,12 @@ namespace ExpenseManager.Views
         private readonly ExpensePresenter presenter;
         private readonly PictureBox chartPictureBox;
         private readonly System.Windows.Forms.Label lblTotal;
+        private readonly ExpenseModel model;
         public DashboardView()
         {
             InitializeComponent();
+
+            model = new ExpenseModel();
 
             chartPictureBox = new PictureBox
             {
@@ -45,9 +48,15 @@ namespace ExpenseManager.Views
             menuStrip.Items.Add(chatMenu);
             Controls.Add(menuStrip);
 
-            presenter = new ExpensePresenter(new DashboardPresenterView(this), new ExpenseModel());
+            presenter = new ExpensePresenter(new DashboardPresenterView(this), model);
             expenseMenu.DropDownItems.Add("Thêm chi tiêu", null, (s, e) => new ExpenseCreateView(presenter).ShowDialog());
-            expenseMenu.DropDownItems.Add("Sửa/Xoá chi tiêu", null, (s, e) => new ExpenseUpdateView(presenter).ShowDialog());
+            expenseMenu.DropDownItems.Add("Sửa/Xoá chi tiêu", null, (s, e) =>
+            {
+                var updatePresenter = new ExpensePresenter(new ExpenseUpdateView(presenter), model);
+                var updateView = new ExpenseUpdateView(updatePresenter);
+                updateView.ShowDialog();
+                updateView.Activate();
+            });
             chatMenu.Click += (s, e) => new ChatView(presenter).ShowDialog();
 
             presenter.UpdateView();

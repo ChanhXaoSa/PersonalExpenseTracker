@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ using System.Windows.Forms;
 
 namespace ExpenseManager.Views
 {
-    public partial class ExpenseUpdateView : Form
+    public partial class ExpenseUpdateView : Form, IExpenseView
     {
         private readonly ExpensePresenter presenter;
         private readonly DataGridView dgvExpenses;
@@ -25,7 +26,17 @@ namespace ExpenseManager.Views
             Size = new Size(800, 500);
             Text = "Sửa/Xóa Chi Tiêu";
 
-            dgvExpenses = new DataGridView { Location = new Point(20, 20), Size = new Size(740, 300) };
+            Controls.Clear();
+
+            dgvExpenses = new DataGridView
+            {
+                Location = new Point(20, 20),
+                Size = new Size(740, 300),
+                AutoGenerateColumns = true,
+                Visible = true,
+                Enabled = true,
+                BackgroundColor = Color.White,
+            };
             var btnEdit = new Button { Text = "Sửa", Location = new Point(20, 340), Width = 100 };
             var btnDelete = new Button { Text = "Xóa", Location = new Point(130, 340), Width = 100 };
 
@@ -33,22 +44,28 @@ namespace ExpenseManager.Views
             btnDelete.Click += BtnDelete_Click;
 
             Controls.AddRange([dgvExpenses, btnEdit, btnDelete]);
-            presenter.UpdateView();
+            Debug.WriteLine($"dgvExpenses có trong Controls: {Controls.Contains(dgvExpenses)}");
+            Debug.WriteLine($"Số lượng control: {Controls.Count}");
+            presenter?.UpdateView();
         }
 
-        public static string Description => string.Empty;
-        public static decimal Amount => 0;
-        public static DateTime Date => DateTime.Now;
-        public static string Category => string.Empty;
+        public string Description => string.Empty;
+        public decimal Amount => 0;
+        public DateTime Date => DateTime.Now;
+        public string Category => string.Empty;
 
-        public static void ShowMessage(string message) => MessageBox.Show(message);
+        public void ShowMessage(string message) => MessageBox.Show(message);
         public void UpdateExpenseList(List<Expense> expenses)
         {
+            Debug.WriteLine($"Số lượng chi tiêu: {expenses?.Count ?? 0}");
             dgvExpenses.DataSource = null;
-            dgvExpenses.DataSource = expenses;
+            dgvExpenses.DataSource = new List<object> { new { TestColumn = "Kiểm tra" } };
+            //dgvExpenses.DataSource = expenses;
+            dgvExpenses.BringToFront();
+            dgvExpenses.Invalidate();
+            //MessageBox.Show("Dữ liệu đã gán");
+            Refresh();
         }
-        //public void UpdateTotal(decimal total) { }
-        //public void UpdateChart(Dictionary<string, decimal> expensesByCategory) { }
 
         private void BtnEdit_Click(object? sender, EventArgs e)
         {
@@ -86,6 +103,16 @@ namespace ExpenseManager.Views
                 var selectedExpense = (Expense)dgvExpenses.SelectedRows[0].DataBoundItem;
                 presenter.DeleteExpense(selectedExpense.Id);
             }
+        }
+
+        public void UpdateTotal(decimal total)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void UpdateChart(Dictionary<string, decimal> expensesByCategory)
+        {
+            //throw new NotImplementedException();
         }
     }
 }
