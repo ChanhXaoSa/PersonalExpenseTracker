@@ -59,10 +59,10 @@ namespace ExpenseManager.Views
         {
             Debug.WriteLine($"Số lượng chi tiêu: {expenses?.Count ?? 0}");
             dgvExpenses.DataSource = null;
-            dgvExpenses.DataSource = new List<object> { new { TestColumn = "Kiểm tra" } };
-            //dgvExpenses.DataSource = expenses;
-            dgvExpenses.BringToFront();
-            dgvExpenses.Invalidate();
+            //dgvExpenses.DataSource = new List<object> { new { TestColumn = "Kiểm tra" } };
+            dgvExpenses.DataSource = expenses;
+            //dgvExpenses.BringToFront();
+            //dgvExpenses.Invalidate();
             //MessageBox.Show("Dữ liệu đã gán");
             Refresh();
         }
