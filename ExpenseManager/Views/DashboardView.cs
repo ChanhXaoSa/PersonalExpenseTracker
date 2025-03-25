@@ -19,8 +19,9 @@ namespace ExpenseManager.Views
         private readonly ExpensePresenter presenter;
         private readonly PictureBox chartPictureBox;
         private readonly System.Windows.Forms.Label lblTotal;
+        private readonly System.Windows.Forms.Label lblUsername;
         private readonly ExpenseModel model;
-        public DashboardView()
+        public DashboardView(string username = "User")
         {
             InitializeComponent();
 
@@ -32,7 +33,6 @@ namespace ExpenseManager.Views
                 Location = new Point(15, 50),
                 BorderStyle = BorderStyle.FixedSingle
             };
-
             Controls.Add(chartPictureBox);
 
             lblTotal = new System.Windows.Forms.Label
@@ -43,6 +43,14 @@ namespace ExpenseManager.Views
             };
             Controls.Add(lblTotal);
 
+            lblUsername = new System.Windows.Forms.Label
+            {
+                Text = $"Xin chào, {username}",
+                Location = new Point(220, 20),
+                Size = new Size(200, 20),
+            };
+            Controls.Add(lblUsername);
+
             var menuStrip = new MenuStrip();
             var expenseMenu = new ToolStripMenuItem("Quản lý chi tiêu");
             var chatMenu = new ToolStripMenuItem("Chat");
@@ -51,6 +59,12 @@ namespace ExpenseManager.Views
             Controls.Add(menuStrip);
 
             presenter = new ExpensePresenter(new DashboardPresenterView(this), model);
+            presenter.OnDataChanged += () =>
+            {
+                Debug.WriteLine("DashboardView: OnDataChanged được gọi");
+                presenter.UpdateView();
+            };
+
             expenseMenu.DropDownItems.Add("Thêm chi tiêu", null, (s, e) =>
             { 
                 var createView = new ExpenseCreateView(presenter);
@@ -69,15 +83,15 @@ namespace ExpenseManager.Views
             {
                 Debug.WriteLine("DashboardView: Bắt đầu tạo ExpenseUpdateView");
                 var updateView = new ExpenseUpdateView(null);
-                var updatePresenter = new ExpensePresenter(updateView, model);
-                updateView.SetPresenter(updatePresenter);
+                presenter.AddView(updateView);
+                updateView.SetPresenter(presenter);
                 Debug.WriteLine("DashboardView: Đã gán presenter");
                 try
                 {
                     Debug.WriteLine("DashboardView: Gọi ShowDialog");
                     updateView.ShowDialog();
                     Debug.WriteLine("DashboardView: ShowDialog hoàn tất");
-                    updateView.Activate();
+                    presenter.RemoveView(updateView);
                 }
                 catch (Exception ex)
                 {

@@ -10,63 +10,85 @@ namespace ExpenseManager.Presenters
 {
     public class ExpensePresenter
     {
-        private readonly IExpenseView view;
+        private readonly List<IExpenseView> views = [];
         public readonly ExpenseModel model;
 
-        public ExpensePresenter(IExpenseView view, ExpenseModel model)
+        public event Action? OnDataChanged;
+
+        public ExpensePresenter(IExpenseView initialView, ExpenseModel model)
         {
-            this.view = view;
+            views.Add(initialView);
             this.model = model;
-            Debug.WriteLine($"ExpensePresenter: Được khởi tạo với view loại {view.GetType().Name}");
+            Debug.WriteLine($"ExpensePresenter: Được khởi tạo với view loại {initialView.GetType().Name}");
         }
 
-        public void AddExpense()
+        public void AddView(IExpenseView view)
         {
-            if(string.IsNullOrEmpty(view.Description) || view.Amount <= 0)
+            if (!views.Contains(view))
             {
-                view.ShowMessage("Vui lòng nhập đầy đủ và hợp lệ!");
+                views.Add(view);
+                Debug.WriteLine($"ExpensePresenter: Thêm view loại {view.GetType().Name}");
+            }
+            UpdateView();
+        }
+
+        public void RemoveView(IExpenseView view)
+        {
+            views.Remove(view);
+            Debug.WriteLine($"ExpensePresenter: Xóa view loại {view.GetType().Name}");
+        }
+
+        public void AddExpense(IExpenseView sourceView)
+        {
+            if (string.IsNullOrEmpty(sourceView.Description) || sourceView.Amount <= 0)
+            {
+                views.ForEach(v => v.ShowMessage("Vui lòng nhập đầy đủ và hợp lệ!"));
                 return;
             }
 
             var expense = new Expense
             {
-                Description = view.Description,
-                Amount = view.Amount,
-                Date = view.Date,
-                Category = view.Category
+                Description = sourceView.Description,
+                Amount = sourceView.Amount,
+                Date = sourceView.Date,
+                Category = sourceView.Category
             };
 
             model.AddExpense(expense);
             UpdateView();
+            OnDataChanged?.Invoke();
         }
 
         public void AddExpense(Expense expense)
         {
             if (string.IsNullOrEmpty(expense.Description) || expense.Amount <= 0)
             {
-                view.ShowMessage("Vui lòng nhập đầy đủ và hợp lệ!");
+                views.ForEach(v => v.ShowMessage("Vui lòng nhập đầy đủ và hợp lệ!"));
                 return;
             }
 
             model.AddExpense(expense);
             UpdateView();
+            OnDataChanged?.Invoke();
         }
 
         public void DeleteExpense(int id)
         {
             model.DeleteExpense(id);
             UpdateView();
+            OnDataChanged?.Invoke();
         }
 
         public void EditExpense(Expense expense)
         {
             if(string.IsNullOrEmpty(expense.Description) || expense.Amount <= 0)
             {
-                view.ShowMessage("Vui lòng nhập đầy đủ và hợp lệ!");
+                views.ForEach(v => v.ShowMessage("Vui lòng nhập đầy đủ và hợp lệ!"));
                 return;
             }
             model.UpdateExpense(expense);
             UpdateView();
+            OnDataChanged?.Invoke();
         }
 
         public void UpdateView()
@@ -75,7 +97,9 @@ namespace ExpenseManager.Presenters
             {
                 var expenses = model.GetAllExpenses();
                 Debug.WriteLine($"Presenter: Truyền {expenses?.Count ?? 0} chi tiêu vào view");
-                Debug.WriteLine($"Presenter: Gọi UpdateExpenseList trên {view.GetType().Name}");
+                foreach (var view in views)
+            {
+                Debug.WriteLine($"Presenter: Cập nhật view loại {view.GetType().Name}");
                 view.UpdateExpenseList(expenses!);
                 view.UpdateTotal(model.GetTotalExpense());
                 var expensesByCategory = model.GetExpensesByCategory();
@@ -87,6 +111,7 @@ namespace ExpenseManager.Presenters
                 {
                     view.UpdateChart(new Dictionary<string, decimal> { { "Không có dữ liệu", 1m } });
                 }
+            }
             }
             catch (Exception ex)
             {
