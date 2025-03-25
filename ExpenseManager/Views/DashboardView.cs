@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,7 @@ namespace ExpenseManager.Views
                 Location = new Point(15, 50),
                 BorderStyle = BorderStyle.FixedSingle
             };
+
             Controls.Add(chartPictureBox);
 
             lblTotal = new System.Windows.Forms.Label
@@ -52,10 +54,23 @@ namespace ExpenseManager.Views
             expenseMenu.DropDownItems.Add("Thêm chi tiêu", null, (s, e) => new ExpenseCreateView(presenter).ShowDialog());
             expenseMenu.DropDownItems.Add("Sửa/Xoá chi tiêu", null, (s, e) =>
             {
-                var updatePresenter = new ExpensePresenter(new ExpenseUpdateView(presenter), model);
-                var updateView = new ExpenseUpdateView(updatePresenter);
-                updateView.ShowDialog();
-                updateView.Activate();
+                Debug.WriteLine("DashboardView: Bắt đầu tạo ExpenseUpdateView");
+                var updateView = new ExpenseUpdateView(null);
+                var updatePresenter = new ExpensePresenter(updateView, model);
+                updateView.SetPresenter(updatePresenter);
+                Debug.WriteLine("DashboardView: Đã gán presenter");
+                try
+                {
+                    Debug.WriteLine("DashboardView: Gọi ShowDialog");
+                    updateView.ShowDialog();
+                    Debug.WriteLine("DashboardView: ShowDialog hoàn tất");
+                    updateView.Activate();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Lỗi khi hiển thị ExpenseUpdateView: {ex.Message}");
+                    MessageBox.Show($"Lỗi khi hiển thị ExpenseUpdateView: {ex.Message}");
+                }
             });
             chatMenu.Click += (s, e) => new ChatView(presenter).ShowDialog();
 
@@ -69,7 +84,10 @@ namespace ExpenseManager.Views
             public string Category => string.Empty;
 
             public void ShowMessage(string message) => MessageBox.Show(message);
-            public void UpdateExpenseList(List<Expense> expenses) { }
+            public void UpdateExpenseList(List<Expense> expenses) 
+            {
+                Debug.WriteLine("chạy ở đây nè");
+            }
             public void UpdateTotal(decimal total) => form.lblTotal.Text = $"Tổng chi tiêu: {total:C}";
             public void UpdateChart(Dictionary<string, decimal> expensesByCategory) => form.UpdateChart(expensesByCategory);
         }

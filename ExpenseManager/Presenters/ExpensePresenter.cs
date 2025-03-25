@@ -1,16 +1,24 @@
 ﻿using ExpenseManager.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ExpenseManager.Presenters
 {
-    public class ExpensePresenter(IExpenseView view, ExpenseModel model)
+    public class ExpensePresenter
     {
-        private readonly IExpenseView view = view;
-        public ExpenseModel model = model;
+        private readonly IExpenseView view;
+        public readonly ExpenseModel model;
+
+        public ExpensePresenter(IExpenseView view, ExpenseModel model)
+        {
+            this.view = view;
+            this.model = model;
+            Debug.WriteLine($"ExpensePresenter: Được khởi tạo với view loại {view.GetType().Name}");
+        }
 
         public void AddExpense()
         {
@@ -63,15 +71,27 @@ namespace ExpenseManager.Presenters
 
         public void UpdateView()
         {
-            view.UpdateExpenseList(model.GetAllExpenses());
-            view.UpdateTotal(model.GetTotalExpense());
-            var expensesByCategory = model.GetExpensesByCategory();
-            if(expensesByCategory.Count > 0)
+            try
             {
-                view.UpdateChart(expensesByCategory);
-            } else
+                var expenses = model.GetAllExpenses();
+                Debug.WriteLine($"Presenter: Truyền {expenses?.Count ?? 0} chi tiêu vào view");
+                Debug.WriteLine($"Presenter: Gọi UpdateExpenseList trên {view.GetType().Name}");
+                view.UpdateExpenseList(expenses!);
+                view.UpdateTotal(model.GetTotalExpense());
+                var expensesByCategory = model.GetExpensesByCategory();
+                if (expensesByCategory.Count > 0)
+                {
+                    view.UpdateChart(expensesByCategory);
+                }
+                else
+                {
+                    view.UpdateChart(new Dictionary<string, decimal> { { "Không có dữ liệu", 1m } });
+                }
+            }
+            catch (Exception ex)
             {
-                view.UpdateChart(new Dictionary<string, decimal> { { "Không có dữ liệu", 1m } });
+                Debug.WriteLine($"Lỗi trong UpdateView: {ex.Message}");
+                MessageBox.Show($"Lỗi trong presenter: {ex.Message}");
             }
         }
     }
