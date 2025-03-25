@@ -156,7 +156,7 @@ namespace ExpenseManager.Views
             }
 
             var selectedExpense = (Expense)dgvExpenses.SelectedRows[0].DataBoundItem;
-            var editForm = new ExpenseCreateView(presenter) { Text = "Sửa Chi Tiêu" };
+            var editForm = new ExpenseCreateView(presenter, selectedExpense);
             if (editForm.ShowDialog() == DialogResult.OK)
             {
                 presenter.EditExpense(new Expense

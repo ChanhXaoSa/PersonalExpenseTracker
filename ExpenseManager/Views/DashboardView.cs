@@ -51,7 +51,20 @@ namespace ExpenseManager.Views
             Controls.Add(menuStrip);
 
             presenter = new ExpensePresenter(new DashboardPresenterView(this), model);
-            expenseMenu.DropDownItems.Add("Thêm chi tiêu", null, (s, e) => new ExpenseCreateView(presenter).ShowDialog());
+            expenseMenu.DropDownItems.Add("Thêm chi tiêu", null, (s, e) =>
+            { 
+                var createView = new ExpenseCreateView(presenter);
+                if(createView.ShowDialog(Owner) == DialogResult.OK)
+                {
+                    presenter.AddExpense(new Expense
+                    {
+                        Description = createView.Description,
+                        Amount = createView.Amount,
+                        Date = createView.Date,
+                        Category = createView.Category
+                    });
+                }
+            });
             expenseMenu.DropDownItems.Add("Sửa/Xoá chi tiêu", null, (s, e) =>
             {
                 Debug.WriteLine("DashboardView: Bắt đầu tạo ExpenseUpdateView");
