@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ExpenseManager.Models;
+using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,16 +14,20 @@ namespace ExpenseManager.Views
 {
     public partial class LoginView : Form
     {
-        public LoginView()
+        private readonly ExpenseModel model;
+        private readonly UserManager<IdentityUser> userManager;
+
+        public LoginView(UserManager<IdentityUser> userManager)
         {
+            this.userManager = userManager;
+            this.model = new ExpenseModel(userManager);
             InitializeComponent();
             SetupUI();
         }
 
         private void SetupUI()
         {
-            Size = new Size(300, 300);
-
+            Size = new Size(300, 200);
             Text = "Đăng nhập";
             StartPosition = FormStartPosition.CenterScreen;
 
@@ -30,12 +36,10 @@ namespace ExpenseManager.Views
             var lblPassword = new Label { Text = "Mật khẩu:", Location = new Point(20, 60) };
             var txtPassword = new TextBox { Location = new Point(120, 60), Width = 150, Name = "txtPassword", UseSystemPasswordChar = true };
             var btnLogin = new Button { Text = "Đăng nhập", Location = new Point(100, 100), Width = 100 };
-            var btnExit = new Button { Text = "Thoát", Location = new Point(100, 140), Width = 100 };
-            btnExit.Click += (s, e) => Application.Exit();
-            Controls.Add(btnExit);
-            btnLogin.Click += (s, e) =>
+
+            btnLogin.Click += async (s, e) =>
             {
-                if (ValidateLogin(txtUsername.Text, txtPassword.Text))
+                if (await model.ValidateUserAsync(txtUsername.Text, txtPassword.Text))
                 {
                     DialogResult = DialogResult.OK;
                     Close();
@@ -49,17 +53,7 @@ namespace ExpenseManager.Views
             Controls.AddRange([lblUsername, txtUsername, lblPassword, txtPassword, btnLogin]);
         }
 
-        private static bool ValidateLogin(string username, string password)
-        {
-            var validUsers = new (string Username, string Password)[]
-            {
-                ("admin", "123456"),
-                ("user", "password")
-            };
-
-            return validUsers.Any(u => u.Username == username && u.Password == password);
-        }
-
         public string Username => Controls["txtUsername"]?.Text ?? string.Empty;
+        public string? UserId => userManager.FindByNameAsync(Username).Result?.Id;
     }
 }

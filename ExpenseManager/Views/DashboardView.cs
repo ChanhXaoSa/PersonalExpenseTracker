@@ -1,5 +1,6 @@
 ﻿using ExpenseManager.Models;
 using ExpenseManager.Presenters;
+using Microsoft.AspNetCore.Identity;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
@@ -21,11 +22,11 @@ namespace ExpenseManager.Views
         private readonly System.Windows.Forms.Label lblTotal;
         private readonly System.Windows.Forms.Label lblUsername;
         private readonly ExpenseModel model;
-        public DashboardView(string username = "User")
+        public DashboardView(string username, string userId, UserManager<IdentityUser> userManager)
         {
             InitializeComponent();
 
-            model = new ExpenseModel();
+            model = new ExpenseModel(userManager);
 
             chartPictureBox = new PictureBox
             {
@@ -58,7 +59,7 @@ namespace ExpenseManager.Views
             menuStrip.Items.Add(chatMenu);
             Controls.Add(menuStrip);
 
-            presenter = new ExpensePresenter(new DashboardPresenterView(this), model);
+            presenter = new ExpensePresenter(new DashboardPresenterView(this), model, userId);
             presenter.OnDataChanged += () =>
             {
                 Debug.WriteLine("DashboardView: OnDataChanged được gọi");
@@ -75,7 +76,8 @@ namespace ExpenseManager.Views
                         Description = createView.Description,
                         Amount = createView.Amount,
                         Date = createView.Date,
-                        Category = createView.Category
+                        Category = createView.Category,
+                        UserId = userId
                     });
                 }
             });
@@ -99,7 +101,7 @@ namespace ExpenseManager.Views
                     MessageBox.Show($"Lỗi khi hiển thị ExpenseUpdateView: {ex.Message}");
                 }
             });
-            chatMenu.Click += (s, e) => new ChatView(presenter).ShowDialog();
+            chatMenu.Click += (s, e) => new ChatView(presenter, userId).ShowDialog();
 
             presenter.UpdateView();
         }

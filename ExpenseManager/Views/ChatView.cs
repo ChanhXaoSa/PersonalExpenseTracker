@@ -19,12 +19,13 @@ namespace ExpenseManager.Views
         private readonly ListBox chatListBox;
         private readonly TextBox txtChatInput;
         private readonly List<Expense> expenses;
+        private readonly string userIdMain;
 
-        public ChatView(ExpensePresenter presenter)
+        public ChatView(ExpensePresenter presenter, string userId)
         {
             InitializeComponent();
             this.presenter = presenter;
-
+            userIdMain = userId;
             Size = new Size(750, 400);
             Text = "Chatbot Quản Lý Chi Tiêu";
 
@@ -34,20 +35,20 @@ namespace ExpenseManager.Views
 
             Controls.AddRange([chatListBox, txtChatInput]);
             chatListBox.Items.Add("Chatbot: Nhập chi tiêu (25 nghìn, 2 triệu đồng), xóa (xóa 15000), hoặc tổng (tổng)");
-            expenses = presenter.model.GetAllExpenses();
+            expenses = presenter.model.GetAllExpenses(userId);
         }
 
         private void TxtChatInput_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                ProcessChatInput(txtChatInput.Text.Trim());
+                ProcessChatInput(txtChatInput.Text.Trim(), userIdMain);
                 txtChatInput.Clear();
                 e.SuppressKeyPress = true;
             }
         }
 
-        private void ProcessChatInput(string input)
+        private void ProcessChatInput(string input, string userId)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -101,7 +102,8 @@ namespace ExpenseManager.Views
                 Description = description,
                 Amount = amount,
                 Date = DateTime.Now,
-                Category = category
+                Category = category,
+                UserId = userId
             };
             presenter.AddExpense(expense);
 

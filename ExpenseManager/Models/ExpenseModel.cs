@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualBasic.ApplicationServices;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
@@ -10,32 +12,38 @@ namespace ExpenseManager.Models
     public class ExpenseModel
     {
         private readonly ExpenseDbContext dbContext;
+        private readonly UserManager<IdentityUser> userManager;
 
-        public ExpenseModel()
+        public ExpenseModel(UserManager<IdentityUser> userManager)
         {
             dbContext = new ExpenseDbContext();
+            this.userManager = userManager;
             dbContext.Database.EnsureCreated();
         }
 
-        public void AddExpense(Expense expense)
+        public void AddExpense(Expense expense, string userId)
         {
+            expense.UserId = userId;
             dbContext.Expenses.Add(expense);
             dbContext.SaveChanges();
         }
 
-        public List<Expense> GetAllExpenses()
+        public List<Expense> GetAllExpenses(string userId)
         {
-            return [.. dbContext.Expenses];
+            return [.. dbContext.Expenses.Where(e => e.UserId == userId && !e.IsDeleted)];
         }
 
-        public decimal GetTotalExpense()
+        public decimal GetTotalExpense(string userId)
         {
-            return dbContext.Expenses.Sum(e => e.Amount);
+            return dbContext.Expenses
+                .Where(e => e.UserId == userId && !e.IsDeleted)
+                .Sum(e => e.Amount);
         }
 
-        public void DeleteExpense(int id)
+        public void DeleteExpense(Guid id, string userId)
         {
-            var expense = dbContext.Expenses.Find(id);
+            var expense = dbContext.Expenses
+                .FirstOrDefault(e => e.Id == id && e.UserId == userId); ;
             if(expense != null)
             {
                 dbContext.Expenses.Remove(expense);
@@ -43,9 +51,10 @@ namespace ExpenseManager.Models
             }
         }
 
-        public void UpdateExpense(Expense expense)
+        public void UpdateExpense(Expense expense, string userId)
         {
-            var existingExpense = dbContext.Expenses.Find(expense.Id);
+            var existingExpense = dbContext.Expenses
+                .FirstOrDefault(e => e.Id == expense.Id && e.UserId == userId);
             if(existingExpense != null)
             {
                 existingExpense.Description = expense.Description;
@@ -56,10 +65,18 @@ namespace ExpenseManager.Models
             }
         }
 
-        public Dictionary<string, decimal> GetExpensesByCategory()
+        public Dictionary<string, decimal> GetExpensesByCategory(string userId)
         {
-            return dbContext.Expenses.GroupBy(e => e.Category)
+            return dbContext.Expenses
+                .Where(e => e.UserId == userId && !e.IsDeleted)
+                .GroupBy(e => e.Category)
                 .ToDictionary(g => g.Key, g => g.Sum(e => e.Amount));
+        }
+
+        public async Task<bool> ValidateUserAsync(string username, string password)
+        {
+            var user = await userManager.FindByNameAsync(username);
+            return user != null && await userManager.CheckPasswordAsync(user, password);
         }
     }
 }

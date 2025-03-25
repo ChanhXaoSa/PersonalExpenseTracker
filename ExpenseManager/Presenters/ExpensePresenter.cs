@@ -12,14 +12,15 @@ namespace ExpenseManager.Presenters
     {
         private readonly List<IExpenseView> views = [];
         public readonly ExpenseModel model;
-
+        private readonly string userId;
         public event Action? OnDataChanged;
 
-        public ExpensePresenter(IExpenseView initialView, ExpenseModel model)
+        public ExpensePresenter(IExpenseView initialView, ExpenseModel model, string userId)
         {
             views.Add(initialView);
             this.model = model;
             Debug.WriteLine($"ExpensePresenter: Được khởi tạo với view loại {initialView.GetType().Name}");
+            this.userId = userId;
         }
 
         public void AddView(IExpenseView view)
@@ -51,10 +52,11 @@ namespace ExpenseManager.Presenters
                 Description = sourceView.Description,
                 Amount = sourceView.Amount,
                 Date = sourceView.Date,
-                Category = sourceView.Category
+                Category = sourceView.Category,
+                UserId = userId,
             };
 
-            model.AddExpense(expense);
+            model.AddExpense(expense, userId);
             UpdateView();
             OnDataChanged?.Invoke();
         }
@@ -67,14 +69,14 @@ namespace ExpenseManager.Presenters
                 return;
             }
 
-            model.AddExpense(expense);
+            model.AddExpense(expense, expense.UserId);
             UpdateView();
             OnDataChanged?.Invoke();
         }
 
-        public void DeleteExpense(int id)
+        public void DeleteExpense(Guid id)
         {
-            model.DeleteExpense(id);
+            model.DeleteExpense(id, userId);
             UpdateView();
             OnDataChanged?.Invoke();
         }
@@ -86,7 +88,7 @@ namespace ExpenseManager.Presenters
                 views.ForEach(v => v.ShowMessage("Vui lòng nhập đầy đủ và hợp lệ!"));
                 return;
             }
-            model.UpdateExpense(expense);
+            model.UpdateExpense(expense, userId);
             UpdateView();
             OnDataChanged?.Invoke();
         }
@@ -95,14 +97,14 @@ namespace ExpenseManager.Presenters
         {
             try
             {
-                var expenses = model.GetAllExpenses();
+                var expenses = model.GetAllExpenses(userId);
                 Debug.WriteLine($"Presenter: Truyền {expenses?.Count ?? 0} chi tiêu vào view");
                 foreach (var view in views)
             {
                 Debug.WriteLine($"Presenter: Cập nhật view loại {view.GetType().Name}");
                 view.UpdateExpenseList(expenses!);
-                view.UpdateTotal(model.GetTotalExpense());
-                var expensesByCategory = model.GetExpensesByCategory();
+                view.UpdateTotal(model.GetTotalExpense(userId));
+                var expensesByCategory = model.GetExpensesByCategory(userId);
                 if (expensesByCategory.Count > 0)
                 {
                     view.UpdateChart(expensesByCategory);

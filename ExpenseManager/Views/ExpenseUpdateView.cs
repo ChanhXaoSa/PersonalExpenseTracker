@@ -165,7 +165,8 @@ namespace ExpenseManager.Views
                     Description = editForm.Description,
                     Amount = editForm.Amount,
                     Date = editForm.Date,
-                    Category = editForm.Category
+                    Category = editForm.Category,
+                    UserId = selectedExpense.UserId
                 });
             }
         }
