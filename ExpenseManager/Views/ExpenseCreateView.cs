@@ -31,7 +31,15 @@ namespace ExpenseManager.Views
             var lblAmount = new Label { Text = "Số tiền:", Location = new Point(20, 60) };
             var txtAmount = new TextBox { Location = new Point(120, 60), Width = 250, Name = "txtAmount" };
             var lblDate = new Label { Text = "Ngày:", Location = new Point(20, 100) };
-            var dtpDate = new DateTimePicker { Location = new Point(120, 100), Width = 250, Name = "dtpDate" };
+            var dtpDate = new DateTimePicker 
+            { 
+                Location = new Point(120, 100), 
+                Width = 250, 
+                Name = "dtpDate",
+                Format = DateTimePickerFormat.Custom,
+                CustomFormat = "HH:mm, dd/MM/yyyy",
+                ShowUpDown = false,
+            };
             var lblCat = new Label { Text = "Danh mục:", Location = new Point(20, 140) };
             var cmbCat = new ComboBox { Location = new Point(120, 140), Width = 250, Name = "cmbCategory" };
             cmbCat.Items.AddRange(["Ăn uống", "Mua sắm", "Hóa đơn", "Khác"]);

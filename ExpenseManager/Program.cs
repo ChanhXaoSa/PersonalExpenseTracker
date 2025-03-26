@@ -12,6 +12,8 @@ namespace ExpenseManager
         static void Main()
         {
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("vi-VN");
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("vi-VN");
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             var services = new ServiceCollection();

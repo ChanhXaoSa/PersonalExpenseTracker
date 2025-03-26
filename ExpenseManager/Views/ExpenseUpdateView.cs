@@ -1,4 +1,5 @@
-﻿using ExpenseManager.Models;
+﻿using CsvHelper;
+using ExpenseManager.Models;
 using ExpenseManager.Presenters;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +18,8 @@ namespace ExpenseManager.Views
     public partial class ExpenseUpdateView : Form, IExpenseView
     {
         private ExpensePresenter? presenter;
-        private readonly DataGridView? dgvExpenses;
+        private readonly ListView? lvExpenses;
+        private List<Expense>? currentExpenses;
 
         public ExpenseUpdateView(ExpensePresenter? _)
         {
@@ -27,23 +30,32 @@ namespace ExpenseManager.Views
                 Size = new Size(800, 500);
                 Text = "Sửa/Xóa Chi Tiêu";
 
-                dgvExpenses = new DataGridView
+                lvExpenses = new ListView
                 {
                     Location = new Point(20, 20),
                     Size = new Size(740, 300),
-                    AutoGenerateColumns = true,
-                    Visible = true,
-                    Enabled = true,
-                    BackgroundColor = Color.White,
+                    View = View.Details,
+                    FullRowSelect = true,
+                    GridLines = true,
+                    BackColor = Color.White,
                 };
+
+                lvExpenses.Columns.Add("ID", 50);
+                lvExpenses.Columns.Add("Mô tả", 200);
+                lvExpenses.Columns.Add("Số tiền", 100);
+                lvExpenses.Columns.Add("Thời gian", 150);
+                lvExpenses.Columns.Add("Danh mục", 100);
+                lvExpenses.Columns.Add("Người dùng", 100);
 
                 var btnEdit = new Button { Text = "Sửa", Location = new Point(20, 340), Width = 100 };
                 var btnDelete = new Button { Text = "Xóa", Location = new Point(130, 340), Width = 100 };
+                var btnExport = new Button { Text = "Xuất Excel", Location = new Point(240, 340), Width = 100 };
 
                 btnEdit.Click += BtnEdit_Click;
                 btnDelete.Click += BtnDelete_Click;
+                btnExport.Click += BtnExport_Click;
 
-                Controls.AddRange([dgvExpenses, btnEdit, btnDelete]);
+                Controls.AddRange([lvExpenses, btnEdit, btnDelete, btnExport]);
 
                 Debug.WriteLine("ExpenseUpdateView: Constructor hoàn tất");
             }
@@ -89,44 +101,18 @@ namespace ExpenseManager.Views
             try
             {
                 Debug.WriteLine("UpdateExpenseList: Bắt đầu thực thi (ExpenseUpdateView)");
-                Debug.WriteLine($"Số lượng chi tiêu: {expenses?.Count ?? 0}");
-                if (expenses != null && expenses.Count > 0)
+                if (expenses == null || lvExpenses == null) return;
+
+                currentExpenses = expenses;
+
+                if (lvExpenses.InvokeRequired)
                 {
-                    foreach (var expense in expenses)
-                    {
-                        Debug.WriteLine($"Chi tiêu: ID={expense.Id}, Desc={expense.Description}, Amount={expense.Amount}, Date={expense.Date}, Cat={expense.Category}");
-                    }
+                    lvExpenses.Invoke(new Action(() => UpdateListView(expenses)));
                 }
                 else
                 {
-                    Debug.WriteLine("Danh sách chi tiêu rỗng hoặc null!");
+                    UpdateListView(expenses);
                 }
-
-                if (dgvExpenses == null)
-                {
-                    Debug.WriteLine("UpdateExpenseList: dgvExpenses là null!");
-                    return;
-                }
-
-                if (dgvExpenses.InvokeRequired)
-                {
-                    Debug.WriteLine("UpdateExpenseList: Yêu cầu Invoke");
-                    dgvExpenses.Invoke(new Action(() =>
-                    {
-                        dgvExpenses.DataSource = null;
-                        dgvExpenses.DataSource = expenses;
-                        dgvExpenses.Refresh();
-                    }));
-                }
-                else
-                {
-                    Debug.WriteLine("UpdateExpenseList: Gán trực tiếp");
-                    dgvExpenses.DataSource = null;
-                    dgvExpenses.DataSource = expenses;
-                    dgvExpenses.Refresh();
-                }
-                Debug.WriteLine("UpdateExpenseList: Gán DataSource hoàn tất (ExpenseUpdateView)");
-                Debug.WriteLine("ExpenseUpdateView: Đặt Visible = true");
             }
             catch (Exception ex)
             {
@@ -135,27 +121,54 @@ namespace ExpenseManager.Views
             }
         }
 
+        private void UpdateListView(List<Expense> expenses)
+        {
+            lvExpenses?.Items.Clear();
+            foreach (var expense in expenses)
+            {
+                var item = new ListViewItem([
+            expense.Id.ToString(),
+            expense.Description,
+            expense.Amount.ToString("C"),
+            expense.Date.ToString("hh:mm, dd/MM/yyyy"),
+            expense.Category,
+            expense.UserId
+        ]);
+                lvExpenses?.Items.Add(item);
+            }
+        }
+
         private void BtnEdit_Click(object? sender, EventArgs e)
         {
-            if (dgvExpenses == null)
+            if(lvExpenses == null || lvExpenses.Items.Count == 0)
             {
-                Debug.WriteLine("UpdateExpenseList: dgvExpenses là null!");
+                ShowMessage("Không có dữ liệu để sửa");
                 return;
             }
 
-            if(presenter == null)
-            {
-                Debug.WriteLine("BtnEdit_Click: Presenter là null!");
-                return;
-            }
-
-            if (dgvExpenses.SelectedRows.Count == 0)
+            if (lvExpenses.SelectedItems.Count == 0)
             {
                 ShowMessage("Chọn một chi tiêu để sửa!");
                 return;
             }
 
-            var selectedExpense = (Expense)dgvExpenses.SelectedRows[0].DataBoundItem;
+            if (presenter == null)
+            {
+                ShowMessage("Presenter vẫn là null sau khi gán!");
+                return;
+            }
+
+            var selectedItem = lvExpenses.SelectedItems[0];
+            var selectedExpense = new Expense
+            {
+                Id = Guid.Parse(selectedItem.SubItems[0].Text),
+                Description = selectedItem.SubItems[1].Text,
+                Amount = decimal.Parse(selectedItem.SubItems[2].Text, System.Globalization.NumberStyles.Currency),
+                Date = DateTime.ParseExact(selectedItem.SubItems[3].Text, "hh:mm, dd/MM/yyyy", null),
+                Category = selectedItem.SubItems[4].Text,
+                UserId = selectedItem.SubItems[5].Text
+            };
+
             var editForm = new ExpenseCreateView(presenter, selectedExpense);
             if (editForm.ShowDialog() == DialogResult.OK)
             {
@@ -173,28 +186,53 @@ namespace ExpenseManager.Views
 
         private void BtnDelete_Click(object? sender, EventArgs e)
         {
-            if (dgvExpenses == null)
+            if(lvExpenses == null || lvExpenses.Items.Count == 0)
             {
-                Debug.WriteLine("UpdateExpenseList: dgvExpenses là null!");
+                ShowMessage("Không có dữ liệu để xoá");
                 return;
             }
 
-            if(presenter == null)
-            {
-                Debug.WriteLine("BtnDelete_Click: Presenter là null!");
-                return;
-            }
-
-            if (dgvExpenses.SelectedRows.Count == 0)
+            if (lvExpenses.SelectedItems.Count == 0)
             {
                 ShowMessage("Chọn một chi tiêu để xóa!");
                 return;
             }
 
+            if (presenter == null)
+            {
+                ShowMessage("Presenter vẫn là null sau khi gán!");
+                return;
+            }
+
             if (MessageBox.Show("Xác nhận xóa?", "Xác nhận", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                var selectedExpense = (Expense)dgvExpenses.SelectedRows[0].DataBoundItem;
-                presenter.DeleteExpense(selectedExpense.Id);
+                var selectedItem = lvExpenses.SelectedItems[0];
+                var expenseId = Guid.Parse(selectedItem.SubItems[0].Text);
+                presenter.DeleteExpense(expenseId);
+            }
+        }
+
+        private void BtnExport_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (currentExpenses == null || currentExpenses.Count == 0)
+                {
+                    ShowMessage("Không có dữ liệu để xuất!");
+                    return;
+                }
+
+                using (var writer = new StreamWriter("expenses.csv"))
+                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    csv.WriteRecords(currentExpenses);
+                }
+                ShowMessage("Đã xuất thành công!");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Lỗi khi xuất file CSV: {ex.Message}");
+                ShowMessage($"Lỗi khi xuất file: {ex.Message}");
             }
         }
 

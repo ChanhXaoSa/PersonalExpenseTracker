@@ -124,7 +124,7 @@ namespace ExpenseManager.Views
         private void UpdateChart(Dictionary<string, decimal> expensesByCategory)
         {
             var chartPlot = new Plot();
-            double[] values = expensesByCategory.Values.Select(c => (double)c).ToArray();
+            double[] values = [.. expensesByCategory.Values.Select(c => (double)c)];
             string[] labels = [.. expensesByCategory.Keys];
             var pie = chartPlot.Add.Pie(values);
             pie.DonutFraction = 0.5;
