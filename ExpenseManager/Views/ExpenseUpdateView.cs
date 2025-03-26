@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using ExpenseManager.Models;
 using ExpenseManager.Presenters;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -214,6 +215,7 @@ namespace ExpenseManager.Views
 
         private void BtnExport_Click(object? sender, EventArgs e)
         {
+            
             try
             {
                 if (currentExpenses == null || currentExpenses.Count == 0)
@@ -221,17 +223,19 @@ namespace ExpenseManager.Views
                     ShowMessage("Không có dữ liệu để xuất!");
                     return;
                 }
-
-                using (var writer = new StreamWriter("expenses.csv"))
-                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+                using (var package = new ExcelPackage())
                 {
-                    csv.WriteRecords(currentExpenses);
+                    var worksheet = package.Workbook.Worksheets.Add("Expenses");
+                    worksheet.Cells[1, 1].LoadFromCollection(currentExpenses, true);
+                    File.WriteAllBytes("expenses.xlsx", package.GetAsByteArray());
                 }
                 ShowMessage("Đã xuất thành công!");
+                Process.Start(new ProcessStartInfo("expenses.xlsx") { UseShellExecute = true });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Lỗi khi xuất file CSV: {ex.Message}");
+                Debug.WriteLine($"Lỗi khi xuất file Excel: {ex.Message}");
                 ShowMessage($"Lỗi khi xuất file: {ex.Message}");
             }
         }
