@@ -16,6 +16,7 @@ namespace ExpenseManager
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
             var services = new ServiceCollection();
             services.AddDbContext<ExpenseDbContext>(options =>
             {
@@ -33,16 +34,53 @@ namespace ExpenseManager
             var serviceProvider = services.BuildServiceProvider();
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-            using var loginView = new LoginView(userManager);
-            if (loginView.ShowDialog() == DialogResult.OK)
+            var context = new MainApplicationContext(userManager);
+            Application.Run(context);
+        }
+    }
+
+    public class MainApplicationContext : ApplicationContext
+    {
+        private readonly UserManager<IdentityUser> userManager;
+
+        public MainApplicationContext(UserManager<IdentityUser> userManager)
+        {
+            this.userManager = userManager;
+            ShowLoginView();
+        }
+
+        private void ShowLoginView()
+        {
+            var loginView = new LoginView(userManager);
+            loginView.FormClosed += (s, e) =>
             {
-                Application.Run(new DashboardView(loginView.Username, loginView.UserId!, userManager));
-            }
-            else
+                if (loginView.DialogResult == DialogResult.OK)
+                {
+                    ShowDashboardView(loginView.Username, loginView.UserId!);
+                }
+                else
+                {
+                    ExitThread();
+                }
+            };
+            loginView.Show();
+        }
+
+        private void ShowDashboardView(string username, string userId)
+        {
+            var dashboardView = new DashboardView(username, userId, userManager);
+            dashboardView.FormClosed += (s, e) =>
             {
-                MessageBox.Show("Bạn cần đăng nhập để sử dụng ứng dụng.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Application.Exit();
-            }
+                if (dashboardView.IsLoggingOut)
+                {
+                    ShowLoginView();
+                }
+                else
+                {
+                    ExitThread();
+                }
+            };
+            dashboardView.Show();
         }
     }
 }

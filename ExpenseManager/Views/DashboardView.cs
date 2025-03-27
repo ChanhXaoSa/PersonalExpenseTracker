@@ -18,45 +18,27 @@ namespace ExpenseManager.Views
     public partial class DashboardView : Form
     {
         private readonly ExpensePresenter presenter;
-        private readonly PictureBox chartPictureBox;
-        private readonly System.Windows.Forms.Label lblTotal;
-        private readonly System.Windows.Forms.Label lblUsername;
         private readonly ExpenseModel model;
+        private readonly UserManager<IdentityUser> userManager;
+        private bool isLoggingOut = false;
+        private Dictionary<string, decimal> _expensesByCategory = [];
         public DashboardView(string username, string userId, UserManager<IdentityUser> userManager)
         {
             InitializeComponent();
 
+            this.userManager = userManager;
+
             model = new ExpenseModel(userManager);
 
-            chartPictureBox = new PictureBox
-            {
-                Size = new Size(700, 300),
-                Location = new Point(15, 50),
-                BorderStyle = BorderStyle.FixedSingle
-            };
-            Controls.Add(chartPictureBox);
-
-            lblTotal = new System.Windows.Forms.Label
-            {
-                Text = "Tổng chi: 0",
-                Location = new Point(15, 20),
-                Size = new Size(200, 20),
-            };
-            Controls.Add(lblTotal);
-
-            lblUsername = new System.Windows.Forms.Label
-            {
-                Text = $"Xin chào, {username}",
-                Location = new Point(220, 20),
-                Size = new Size(200, 20),
-            };
-            Controls.Add(lblUsername);
+            lblUsername.Text = $"Xin chào, {username}";
 
             var menuStrip = new MenuStrip();
             var expenseMenu = new ToolStripMenuItem("Quản lý chi tiêu");
             var chatMenu = new ToolStripMenuItem("Chat");
+            var userMenu = new ToolStripMenuItem("Tài Khoản");
             menuStrip.Items.Add(expenseMenu);
             menuStrip.Items.Add(chatMenu);
+            menuStrip.Items.Add(userMenu);
             Controls.Add(menuStrip);
 
             presenter = new ExpensePresenter(new DashboardPresenterView(this), model, userId);
@@ -67,9 +49,9 @@ namespace ExpenseManager.Views
             };
 
             expenseMenu.DropDownItems.Add("Thêm chi tiêu", null, (s, e) =>
-            { 
+            {
                 var createView = new ExpenseCreateView(presenter);
-                if(createView.ShowDialog(Owner) == DialogResult.OK)
+                if (createView.ShowDialog(Owner) == DialogResult.OK)
                 {
                     presenter.AddExpense(new Expense
                     {
@@ -101,6 +83,16 @@ namespace ExpenseManager.Views
                     MessageBox.Show($"Lỗi khi hiển thị ExpenseUpdateView: {ex.Message}");
                 }
             });
+
+            userMenu.DropDownItems.Add("Đăng xuất", null, (s, e) =>
+            {
+                if (File.Exists("login_token.json"))
+                {
+                    File.Delete("login_token.json");
+                }
+                isLoggingOut = true;
+                Close();
+            });
             chatMenu.Click += (s, e) => new ChatView(presenter, userId).ShowDialog();
 
             presenter.UpdateView();
@@ -113,7 +105,7 @@ namespace ExpenseManager.Views
             public string Category => string.Empty;
 
             public void ShowMessage(string message) => MessageBox.Show(message);
-            public void UpdateExpenseList(List<Expense> expenses) 
+            public void UpdateExpenseList(List<Expense> expenses)
             {
                 Debug.WriteLine("chạy ở đây nè");
             }
@@ -123,9 +115,15 @@ namespace ExpenseManager.Views
 
         private void UpdateChart(Dictionary<string, decimal> expensesByCategory)
         {
+            _expensesByCategory = expensesByCategory;
+            RenderChart();
+        }
+
+        private void RenderChart()
+        {
             var chartPlot = new Plot();
-            double[] values = [.. expensesByCategory.Values.Select(c => (double)c)];
-            string[] labels = [.. expensesByCategory.Keys];
+            double[] values = [.. _expensesByCategory.Values.Select(c => (double)c)];
+            string[] labels = [.. _expensesByCategory.Keys];
             var pie = chartPlot.Add.Pie(values);
             pie.DonutFraction = 0.5;
 
@@ -145,5 +143,29 @@ namespace ExpenseManager.Views
             using var stream = new MemoryStream(scottImage.GetImageBytes());
             chartPictureBox.Image = System.Drawing.Image.FromStream(stream);
         }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (!isLoggingOut && e.CloseReason == CloseReason.UserClosing)
+            {
+                var result = MessageBox.Show("Bạn có chắc muốn thoát ứng dụng?", "Xác nhận",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+            base.OnFormClosing(e);
+        }
+
+        private void ChartPictureBox_Resize(object sender, EventArgs e)
+        {
+            if (_expensesByCategory != null && _expensesByCategory.Count > 0)
+            {
+                RenderChart();
+            }
+        }
+
+        public bool IsLoggingOut => isLoggingOut;
     }
 }

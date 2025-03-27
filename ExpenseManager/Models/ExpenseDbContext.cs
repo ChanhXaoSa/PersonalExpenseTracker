@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ExpenseManager.Models
 {
-    public class ExpenseDbContext : IdentityDbContext<IdentityUser>
+    public class ExpenseDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Expense> Expenses { get; set; }
 
