@@ -35,10 +35,17 @@
             panel3 = new Panel();
             panel2 = new Panel();
             chartPictureBox = new PictureBox();
+            panel4 = new Panel();
+            panel5 = new Panel();
+            panel6 = new Panel();
+            listView1 = new ListView();
+            listView2 = new ListView();
             panel1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chartPictureBox).BeginInit();
+            panel5.SuspendLayout();
+            panel6.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
@@ -46,10 +53,10 @@
             panel1.Controls.Add(lblTotal);
             panel1.Controls.Add(lblUsername);
             panel1.Dock = DockStyle.Top;
-            panel1.Location = new Point(0, 0);
+            panel1.Location = new Point(142, 0);
             panel1.Margin = new Padding(0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(852, 43);
+            panel1.Size = new Size(710, 43);
             panel1.TabIndex = 0;
             // 
             // lblTotal
@@ -65,7 +72,7 @@
             // lblUsername
             // 
             lblUsername.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            lblUsername.Location = new Point(540, 11);
+            lblUsername.Location = new Point(398, 11);
             lblUsername.Name = "lblUsername";
             lblUsername.Size = new Size(300, 20);
             lblUsername.TabIndex = 0;
@@ -80,19 +87,19 @@
             tableLayoutPanel1.Controls.Add(panel3, 1, 0);
             tableLayoutPanel1.Controls.Add(panel2, 0, 0);
             tableLayoutPanel1.Dock = DockStyle.Top;
-            tableLayoutPanel1.Location = new Point(0, 43);
+            tableLayoutPanel1.Location = new Point(142, 43);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Size = new Size(852, 325);
+            tableLayoutPanel1.Size = new Size(710, 325);
             tableLayoutPanel1.TabIndex = 1;
             // 
             // panel3
             // 
             panel3.Dock = DockStyle.Fill;
-            panel3.Location = new Point(429, 3);
+            panel3.Location = new Point(358, 3);
             panel3.Name = "panel3";
-            panel3.Size = new Size(420, 319);
+            panel3.Size = new Size(349, 319);
             panel3.TabIndex = 1;
             // 
             // panel2
@@ -101,7 +108,7 @@
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(3, 3);
             panel2.Name = "panel2";
-            panel2.Size = new Size(420, 319);
+            panel2.Size = new Size(349, 319);
             panel2.TabIndex = 0;
             // 
             // chartPictureBox
@@ -109,27 +116,79 @@
             chartPictureBox.Dock = DockStyle.Fill;
             chartPictureBox.Location = new Point(0, 0);
             chartPictureBox.Name = "chartPictureBox";
-            chartPictureBox.Size = new Size(420, 319);
+            chartPictureBox.Size = new Size(349, 319);
             chartPictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
             chartPictureBox.TabIndex = 0;
             chartPictureBox.TabStop = false;
             chartPictureBox.Resize += ChartPictureBox_Resize;
             // 
+            // panel4
+            // 
+            panel4.Dock = DockStyle.Left;
+            panel4.Location = new Point(0, 0);
+            panel4.Name = "panel4";
+            panel4.Size = new Size(142, 1027);
+            panel4.TabIndex = 2;
+            // 
+            // panel5
+            // 
+            panel5.Controls.Add(listView1);
+            panel5.Dock = DockStyle.Top;
+            panel5.Location = new Point(142, 368);
+            panel5.Name = "panel5";
+            panel5.Size = new Size(710, 247);
+            panel5.TabIndex = 3;
+            // 
+            // panel6
+            // 
+            panel6.Controls.Add(listView2);
+            panel6.Dock = DockStyle.Top;
+            panel6.Location = new Point(142, 615);
+            panel6.Name = "panel6";
+            panel6.Size = new Size(710, 249);
+            panel6.TabIndex = 4;
+            // 
+            // listView1
+            // 
+            listView1.Dock = DockStyle.Fill;
+            listView1.Location = new Point(0, 0);
+            listView1.Name = "listView1";
+            listView1.Size = new Size(710, 247);
+            listView1.TabIndex = 0;
+            listView1.UseCompatibleStateImageBehavior = false;
+            // 
+            // listView2
+            // 
+            listView2.Dock = DockStyle.Fill;
+            listView2.Location = new Point(0, 0);
+            listView2.Name = "listView2";
+            listView2.Size = new Size(710, 249);
+            listView2.TabIndex = 1;
+            listView2.UseCompatibleStateImageBehavior = false;
+            // 
             // DashboardView
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(852, 729);
+            AutoScroll = true;
+            ClientSize = new Size(852, 1027);
+            Controls.Add(panel6);
+            Controls.Add(panel5);
             Controls.Add(tableLayoutPanel1);
             Controls.Add(panel1);
+            Controls.Add(panel4);
             Name = "DashboardView";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "DashboardView";
+            WindowState = FormWindowState.Maximized;
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)chartPictureBox).EndInit();
+            panel5.ResumeLayout(false);
+            panel6.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -142,5 +201,10 @@
         private Panel panel3;
         private Panel panel2;
         private PictureBox chartPictureBox;
+        private Panel panel4;
+        private Panel panel5;
+        private Panel panel6;
+        private ListView listView1;
+        private ListView listView2;
     }
 }
