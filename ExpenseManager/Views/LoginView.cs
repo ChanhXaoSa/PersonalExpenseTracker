@@ -13,12 +13,6 @@ namespace ExpenseManager.Views
     {
         private readonly ExpenseModel model;
         private readonly UserManager<IdentityUser> userManager;
-        private TextBox txtUsername;
-        private TextBox txtPassword;
-        private TextBox txtPin;
-        private RadioButton rbPassword;
-        private RadioButton rbPin;
-        private CheckBox chkRememberMe;
         private const string TokenFilePath = "login_token.json";
 
         public LoginView(UserManager<IdentityUser> userManager)
@@ -32,56 +26,11 @@ namespace ExpenseManager.Views
 
         private void SetupUI()
         {
-            Size = new Size(300, 330);
-            Text = "Đăng nhập";
-            StartPosition = FormStartPosition.CenterScreen;
-
-            var lblUsername = new Label { Text = "Tên đăng nhập:", Location = new Point(20, 20) };
-            txtUsername = new TextBox { Location = new Point(120, 20), Width = 150, Name = "txtUsername" };
-
-            rbPassword = new RadioButton { Text = "Dùng mật khẩu", Location = new Point(20, 60), Checked = true };
-            var lblPassword = new Label { Text = "Mật khẩu:", Location = new Point(20, 90) };
-            txtPassword = new TextBox
-            {
-                Location = new Point(120, 90),
-                Width = 150,
-                Name = "txtPassword",
-                UseSystemPasswordChar = true
-            };
-
-            rbPin = new RadioButton { Text = "Dùng PIN", Location = new Point(20, 130) };
-            var lblPin = new Label { Text = "Mã PIN:", Location = new Point(20, 160) };
-            txtPin = new TextBox
-            {
-                Location = new Point(120, 160),
-                Width = 150,
-                Name = "txtPin",
-                MaxLength = 6
-            };
-
-            chkRememberMe = new CheckBox { Text = "Lưu đăng nhập", Location = new Point(120, 190), Width = 150 };
-
-            var btnLogin = new Button { Text = "Đăng nhập", Location = new Point(100, 230), Width = 100 };
-
             txtUsername.KeyDown += async (s, e) => await HandleEnterKey(e);
             txtPassword.KeyDown += async (s, e) => await HandleEnterKey(e);
-            txtPin.KeyDown += async (s, e) => await HandleEnterKey(e);
-
-            rbPassword.CheckedChanged += (s, e) => UpdateInputVisibility();
-            rbPin.CheckedChanged += (s, e) => UpdateInputVisibility();
-
+            var msLogo = new MemoryStream(Resources.logo);
+            pbLogo.Image = Image.FromStream(msLogo);
             btnLogin.Click += async (s, e) => await PerformLogin();
-
-            Controls.AddRange([lblUsername, txtUsername, rbPassword, lblPassword, txtPassword,
-                rbPin, lblPin, txtPin, chkRememberMe, btnLogin]);
-
-            UpdateInputVisibility();
-        }
-
-        private void UpdateInputVisibility()
-        {
-            txtPassword.Enabled = rbPassword.Checked;
-            txtPin.Enabled = rbPin.Checked;
         }
 
         private async Task HandleEnterKey(KeyEventArgs e)
@@ -103,14 +52,7 @@ namespace ExpenseManager.Views
             }
 
             bool loginSuccess = false;
-            if (rbPassword.Checked)
-            {
-                loginSuccess = await model.ValidateUserAsync(username, txtPassword.Text);
-            }
-            else if (rbPin.Checked)
-            {
-                loginSuccess = await model.ValidatePinAsync(username, txtPin.Text);
-            }
+            loginSuccess = await model.ValidateUserAsync(username, txtPassword.Text);
 
             if (loginSuccess)
             {
@@ -123,7 +65,7 @@ namespace ExpenseManager.Views
             }
             else
             {
-                MessageBox.Show($"Tên đăng nhập hoặc {(rbPassword.Checked ? "mật khẩu" : "mã PIN")} không đúng!",
+                MessageBox.Show($"Tên đăng nhập hoặc {("mật khẩu")} không đúng!",
                     "Lỗi đăng nhập", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -169,6 +111,11 @@ namespace ExpenseManager.Views
             public string UserId { get; set; }
             public string Username { get; set; }
             public DateTime Expiry { get; set; }
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
         }
     }
 }
