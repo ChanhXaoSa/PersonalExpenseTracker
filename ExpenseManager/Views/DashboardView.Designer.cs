@@ -33,15 +33,18 @@
             lblUsername = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
             panel3 = new Panel();
+            comboChartPictureBox = new PictureBox();
             panel2 = new Panel();
             chartPictureBox = new PictureBox();
             panel4 = new Panel();
             panel5 = new Panel();
+            lb5Lastest = new ListBox();
             panel6 = new Panel();
-            listView1 = new ListView();
-            listView2 = new ListView();
+            lvDashboardExpenses = new ListView();
             panel1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
+            panel3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)comboChartPictureBox).BeginInit();
             panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chartPictureBox).BeginInit();
             panel5.SuspendLayout();
@@ -96,11 +99,23 @@
             // 
             // panel3
             // 
+            panel3.Controls.Add(comboChartPictureBox);
             panel3.Dock = DockStyle.Fill;
             panel3.Location = new Point(358, 3);
             panel3.Name = "panel3";
             panel3.Size = new Size(349, 319);
             panel3.TabIndex = 1;
+            // 
+            // comboChartPictureBox
+            // 
+            comboChartPictureBox.Dock = DockStyle.Fill;
+            comboChartPictureBox.Location = new Point(0, 0);
+            comboChartPictureBox.Name = "comboChartPictureBox";
+            comboChartPictureBox.Size = new Size(349, 319);
+            comboChartPictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
+            comboChartPictureBox.TabIndex = 0;
+            comboChartPictureBox.TabStop = false;
+            comboChartPictureBox.Resize += ComboChartPictureBox_Resize;
             // 
             // panel2
             // 
@@ -132,39 +147,40 @@
             // 
             // panel5
             // 
-            panel5.Controls.Add(listView1);
+            panel5.Controls.Add(lb5Lastest);
             panel5.Dock = DockStyle.Top;
             panel5.Location = new Point(142, 368);
             panel5.Name = "panel5";
-            panel5.Size = new Size(710, 247);
+            panel5.Size = new Size(710, 168);
             panel5.TabIndex = 3;
+            // 
+            // lb5Lastest
+            // 
+            lb5Lastest.Dock = DockStyle.Fill;
+            lb5Lastest.FormattingEnabled = true;
+            lb5Lastest.Location = new Point(0, 0);
+            lb5Lastest.Name = "lb5Lastest";
+            lb5Lastest.Size = new Size(710, 168);
+            lb5Lastest.TabIndex = 0;
             // 
             // panel6
             // 
-            panel6.Controls.Add(listView2);
-            panel6.Dock = DockStyle.Top;
-            panel6.Location = new Point(142, 615);
+            panel6.Controls.Add(lvDashboardExpenses);
+            panel6.Dock = DockStyle.Fill;
+            panel6.Location = new Point(142, 536);
             panel6.Name = "panel6";
-            panel6.Size = new Size(710, 249);
+            panel6.Size = new Size(710, 491);
             panel6.TabIndex = 4;
             // 
-            // listView1
+            // lvDashboardExpenses
             // 
-            listView1.Dock = DockStyle.Fill;
-            listView1.Location = new Point(0, 0);
-            listView1.Name = "listView1";
-            listView1.Size = new Size(710, 247);
-            listView1.TabIndex = 0;
-            listView1.UseCompatibleStateImageBehavior = false;
-            // 
-            // listView2
-            // 
-            listView2.Dock = DockStyle.Fill;
-            listView2.Location = new Point(0, 0);
-            listView2.Name = "listView2";
-            listView2.Size = new Size(710, 249);
-            listView2.TabIndex = 1;
-            listView2.UseCompatibleStateImageBehavior = false;
+            lvDashboardExpenses.Dock = DockStyle.Fill;
+            lvDashboardExpenses.Location = new Point(0, 0);
+            lvDashboardExpenses.Name = "lvDashboardExpenses";
+            lvDashboardExpenses.Size = new Size(710, 491);
+            lvDashboardExpenses.TabIndex = 1;
+            lvDashboardExpenses.UseCompatibleStateImageBehavior = false;
+            lvDashboardExpenses.View = View.Details;
             // 
             // DashboardView
             // 
@@ -184,6 +200,9 @@
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
+            panel3.ResumeLayout(false);
+            panel3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)comboChartPictureBox).EndInit();
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)chartPictureBox).EndInit();
@@ -204,7 +223,8 @@
         private Panel panel4;
         private Panel panel5;
         private Panel panel6;
-        private ListView listView1;
-        private ListView listView2;
+        private ListView lvDashboardExpenses;
+        private PictureBox comboChartPictureBox;
+        private ListBox lb5Lastest;
     }
 }

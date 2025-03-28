@@ -30,7 +30,7 @@ namespace ExpenseManager.Models
 
         public List<Expense> GetAllExpenses(string userId)
         {
-            return [.. dbContext.Expenses.Where(e => e.UserId == userId && !e.IsDeleted)];
+            return [.. dbContext.Expenses.Where(e => e.UserId == userId && !e.IsDeleted).OrderByDescending(e => e.Date)];
         }
 
         public decimal GetTotalExpense(string userId)

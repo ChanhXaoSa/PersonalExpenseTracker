@@ -22,6 +22,7 @@ namespace ExpenseManager.Views
         private readonly UserManager<IdentityUser> userManager;
         private bool isLoggingOut = false;
         private Dictionary<string, decimal> _expensesByCategory = [];
+        private Dictionary<DateTime, decimal> _expensesByMonth = [];
         public DashboardView(string username, string userId, UserManager<IdentityUser> userManager)
         {
             InitializeComponent();
@@ -95,6 +96,13 @@ namespace ExpenseManager.Views
             });
             chatMenu.Click += (s, e) => new ChatView(presenter, userId).ShowDialog();
 
+            lvDashboardExpenses.Columns.Add("ID", 50);
+            lvDashboardExpenses.Columns.Add("Mô tả", 200);
+            lvDashboardExpenses.Columns.Add("Số tiền", 100);
+            lvDashboardExpenses.Columns.Add("Thời gian", 150);
+            lvDashboardExpenses.Columns.Add("Danh mục", 100);
+            lvDashboardExpenses.Columns.Add("Người dùng", 100);
+
             presenter.UpdateView();
         }
         private class DashboardPresenterView(DashboardView form) : IExpenseView
@@ -108,6 +116,28 @@ namespace ExpenseManager.Views
             public void UpdateExpenseList(List<Expense> expenses)
             {
                 Debug.WriteLine("chạy ở đây nè");
+                form._expensesByMonth = GetMonthlyExpenses(expenses);
+                form.RenderComboChart();
+                form.lb5Lastest.Items.Clear();
+                form.lb5Lastest.Items.Add("5 CHI TIÊU GẦN NHẤT");
+                var list5LastestExpenses = Get5LatestExpenses(expenses);
+                foreach (var expense in list5LastestExpenses)
+                {
+                    form.lb5Lastest.Items.Add($"[{expense.Category}] {expense.Description} - {expense.Amount:C} - {expense.Date:dd/MM/yyyy}");
+                }
+                form.lvDashboardExpenses?.Items.Clear();
+                foreach (var expense in expenses)
+                {
+                    var item = new ListViewItem([
+                        expense.Id.ToString(),
+                        expense.Description,
+                        expense.Amount.ToString("C"),
+                        expense.Date.ToString("hh:mm, dd/MM/yyyy"),
+                        expense.Category,
+                        expense.UserId
+                        ]);
+                    form.lvDashboardExpenses?.Items.Add(item);
+                }
             }
             public void UpdateTotal(decimal total) => form.lblTotal.Text = $"Tổng chi tiêu: {total:C}";
             public void UpdateChart(Dictionary<string, decimal> expensesByCategory) => form.UpdateChart(expensesByCategory);
@@ -117,6 +147,49 @@ namespace ExpenseManager.Views
         {
             _expensesByCategory = expensesByCategory;
             RenderChart();
+
+            //var expenses = presenter.GetExpenses();
+            //_expensesByMonth = GetMonthlyExpenses(expenses);
+            RenderComboChart();
+        }
+
+        private void RenderComboChart()
+        {
+            if (_expensesByMonth.Count == 0) return;
+
+            var chartPlot = new Plot();
+
+            // Chuẩn bị dữ liệu
+            var dates = _expensesByMonth.Keys.OrderBy(d => d).ToArray();
+            var values = dates.Select(d => (double)_expensesByMonth[d]).ToArray();
+            var positions = Enumerable.Range(0, dates.Length).Select(x => (double)x).ToArray();
+
+            // Thêm biểu đồ cột
+            var bars = chartPlot.Add.Bars(positions, values);
+            bars.LegendText = "Chi tiêu hàng tháng";
+
+            // Thêm biểu đồ đường
+            var line = chartPlot.Add.Scatter(positions, values);
+            line.LegendText = "Xu hướng";
+            line.Color = ScottPlot.Color.FromColor(System.Drawing.Color.Red);
+            line.MarkerSize = 5;
+
+            // Cấu hình trục X
+            chartPlot.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual(
+                positions,
+                [.. dates.Select(d => d.ToString("MM/yyyy"))]);
+
+            // Cấu hình biểu đồ
+            chartPlot.ShowLegend(Alignment.UpperRight);
+            chartPlot.Axes.Left.Label.Text = "Số tiền (VND)";
+            chartPlot.Axes.Bottom.Label.Text = "Tháng";
+            chartPlot.Axes.AutoScale();
+
+            // Render biểu đồ
+            comboChartPictureBox.Image?.Dispose();
+            using var scottImage = chartPlot.GetImage(comboChartPictureBox.Width, comboChartPictureBox.Height);
+            using var stream = new MemoryStream(scottImage.GetImageBytes());
+            comboChartPictureBox.Image = System.Drawing.Image.FromStream(stream);
         }
 
         private void RenderChart()
@@ -144,6 +217,20 @@ namespace ExpenseManager.Views
             chartPictureBox.Image = System.Drawing.Image.FromStream(stream);
         }
 
+        private static Dictionary<DateTime, decimal> GetMonthlyExpenses(List<Expense> expenses)
+        {
+            return expenses
+                .GroupBy(e => new DateTime(e.Date.Year, e.Date.Month, 1))
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Sum(e => e.Amount));
+        }
+
+        private static List<Expense> Get5LatestExpenses(List<Expense> expenses)
+        {
+            return [.. expenses.OrderByDescending(e => e.Date).Take(5)];
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (!isLoggingOut && e.CloseReason == CloseReason.UserClosing)
@@ -163,6 +250,14 @@ namespace ExpenseManager.Views
             if (_expensesByCategory != null && _expensesByCategory.Count > 0)
             {
                 RenderChart();
+            }
+        }
+
+        private void ComboChartPictureBox_Resize(object sender, EventArgs e)
+        {
+            if (_expensesByMonth != null && _expensesByMonth.Count > 0)
+            {
+                RenderComboChart();
             }
         }
 

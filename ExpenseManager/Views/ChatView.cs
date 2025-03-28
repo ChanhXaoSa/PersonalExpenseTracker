@@ -2,13 +2,8 @@
 using ExpenseManager.Presenters;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ExpenseManager.Views
@@ -16,8 +11,9 @@ namespace ExpenseManager.Views
     public partial class ChatView : Form
     {
         private readonly ExpensePresenter presenter;
-        private readonly ListBox chatListBox;
+        private readonly FlowLayoutPanel chatPanel;
         private readonly TextBox txtChatInput;
+        private readonly Button btnSend;
         private readonly List<Expense> expenses;
         private readonly string userIdMain;
 
@@ -26,15 +22,43 @@ namespace ExpenseManager.Views
             InitializeComponent();
             this.presenter = presenter;
             userIdMain = userId;
-            Size = new Size(750, 400);
+            Size = new Size(750, 500);
             Text = "Chatbot Quản Lý Chi Tiêu";
+            BackColor = Color.White;
 
-            chatListBox = new ListBox { Location = new Point(15, 20), Size = new Size(700, 300), BorderStyle = BorderStyle.FixedSingle };
-            txtChatInput = new TextBox { Location = new Point(15, 330), Size = new Size(700, 30), BorderStyle = BorderStyle.FixedSingle };
+            chatPanel = new FlowLayoutPanel
+            {
+                Location = new Point(10, 10),
+                Size = new Size(720, 400),
+                AutoScroll = true,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            txtChatInput = new TextBox
+            {
+                Location = new Point(10, 420),
+                Size = new Size(620, 30),
+                BorderStyle = BorderStyle.FixedSingle,
+                Font = new Font("Segoe UI", 10)
+            };
             txtChatInput.KeyDown += TxtChatInput_KeyDown;
 
-            Controls.AddRange([chatListBox, txtChatInput]);
-            chatListBox.Items.Add("Chatbot: Nhập chi tiêu (25 nghìn, 2 triệu đồng), xóa (xóa 15000), hoặc tổng (tổng)");
+            btnSend = new Button
+            {
+                Location = new Point(640, 420),
+                Size = new Size(90, 30),
+                Text = "Gửi",
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.FromArgb(0, 122, 204),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            };
+            btnSend.Click += (s, e) => ProcessChatInput(txtChatInput.Text.Trim(), userIdMain);
+
+            Controls.AddRange([chatPanel, txtChatInput, btnSend]);
+            AddMessage("Chatbot: Nhập chi tiêu (25 nghìn, 2 triệu đồng), xóa (xóa 15000), hoặc tổng (tổng)", false);
             expenses = presenter.model.GetAllExpenses(userId);
         }
 
@@ -43,29 +67,23 @@ namespace ExpenseManager.Views
             if (e.KeyCode == Keys.Enter)
             {
                 ProcessChatInput(txtChatInput.Text.Trim(), userIdMain);
-                txtChatInput.Clear();
                 e.SuppressKeyPress = true;
             }
         }
 
         private void ProcessChatInput(string input, string userId)
         {
-            if (string.IsNullOrEmpty(input))
-            {
-                chatListBox.Items.Add("Chatbot: Vui lòng nhập thông tin!");
-                return;
-            }
+            if (string.IsNullOrEmpty(input)) return;
 
-            chatListBox.Items.Add($"Bạn: {input}");
+            AddMessage($"Bạn: {input}", true);
             input = input.ToLower().Trim();
 
             if (input == "tổng")
             {
                 decimal total = expenses?.Sum(e => e.Amount) ?? 0;
-                chatListBox.Items.Add($"Chatbot: Tổng chi tiêu hiện tại: {total:C}");
-                return;
+                AddMessage($"Chatbot: Tổng chi tiêu hiện tại: {total:C}", false);
             }
-            if (input.StartsWith("xóa "))
+            else if (input.StartsWith("xóa "))
             {
                 var match = DeleteExpenseRegex().Match(input);
                 if (match.Success)
@@ -74,41 +92,116 @@ namespace ExpenseManager.Views
                     var expenseToDelete = expenses?.LastOrDefault(e => e.Amount == amount_delete);
                     if (expenseToDelete != null)
                     {
-                        presenter.DeleteExpense(expenseToDelete.Id); // Giả sử có DeleteExpense
-                        chatListBox.Items.Add($"Chatbot: Đã xóa chi tiêu {amount_delete:C}");
+                        presenter.DeleteExpense(expenseToDelete.Id);
+                        AddMessage($"Chatbot: Đã xóa chi tiêu {amount_delete:C}", false);
                     }
                     else
                     {
-                        chatListBox.Items.Add("Chatbot: Không tìm thấy chi tiêu để xóa!");
+                        AddMessage("Chatbot: Không tìm thấy chi tiêu để xóa!", false);
                     }
                 }
                 else
                 {
-                    chatListBox.Items.Add("Chatbot: Định dạng xóa không hợp lệ! Ví dụ: 'xóa 15000'");
+                    AddMessage("Chatbot: Định dạng xóa không hợp lệ! Ví dụ: 'xóa 15000'", false);
                 }
-                return;
+            }
+            else
+            {
+                var (description, amount, category) = ParseExpenseInput(input);
+                if (amount <= 0)
+                {
+                    AddMessage("Chatbot: Định dạng không hợp lệ! Ví dụ: 'mua cá 25 nghìn', '15000đ'", false);
+                    return;
+                }
+
+                var expense = new Expense
+                {
+                    Description = description,
+                    Amount = amount,
+                    Date = DateTime.Now,
+                    Category = category,
+                    UserId = userId
+                };
+                presenter.AddExpense(expense);
+                AddMessage($"Chatbot: Đã thêm '{description}' - {amount:C} vào '{category}'", false);
             }
 
-            var (description, amount, category) = ParseExpenseInput(input);
-
-            if (amount <= 0)
-            {
-                chatListBox.Items.Add("Chatbot: Định dạng không hợp lệ! Ví dụ: 'mua cá 25 nghìn', '15000đ'");
-                return;
-            }
-
-            var expense = new Expense
-            {
-                Description = description,
-                Amount = amount,
-                Date = DateTime.Now,
-                Category = category,
-                UserId = userId
-            };
-            presenter.AddExpense(expense);
-
-            chatListBox.Items.Add($"Chatbot: Đã thêm '{description}' - {amount:C} vào '{category}'");
+            txtChatInput.Clear();
+            chatPanel.ScrollControlIntoView(chatPanel.Controls[chatPanel.Controls.Count - 1]);
         }
+
+        private void AddMessage(string message, bool isUser)
+        {
+            var messagePanel = new Panel
+            {
+                Size = new Size(700, 50),
+                Margin = new Padding(5)
+            };
+
+            var icon = new PictureBox
+            {
+                Size = new Size(30, 30),
+                Location = new Point(10, 10),
+                SizeMode = PictureBoxSizeMode.StretchImage
+            };
+
+            try
+            {
+                if (isUser)
+                {
+                    using (var ms = new System.IO.MemoryStream(Resources.user))
+                    {
+                        icon.Image = Image.FromStream(ms);
+                    }
+                }
+                else
+                {
+                    using (var ms = new System.IO.MemoryStream(Resources.bot))
+                    {
+                        icon.Image = Image.FromStream(ms);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                icon.BackColor = isUser ? Color.Blue : Color.Green;
+                icon.BorderStyle = BorderStyle.FixedSingle;
+            }
+
+            var bubble = new Label
+            {
+                AutoSize = true,
+                MaximumSize = new Size(600, 0),
+                Text = message,
+                Padding = new Padding(10),
+                BackColor = isUser ? Color.FromArgb(0, 122, 204) : Color.FromArgb(240, 240, 240),
+                ForeColor = isUser ? Color.White : Color.Black,
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(50, 10),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            messagePanel.Controls.AddRange([icon, bubble]);
+
+            if (isUser)
+            {
+                bubble.Left = messagePanel.Width - bubble.Width - 40;
+                icon.Left = bubble.Left + bubble.Width + 10;
+            }
+            else
+            {
+                bubble.Left = 50;
+                icon.Left = 10;
+            }
+
+            messagePanel.Height = Math.Max(bubble.Height + 20, 50);
+            bubble.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, bubble.Width, bubble.Height, 15, 15));
+
+            chatPanel.Controls.Add(messagePanel);
+        }
+
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        private static extern IntPtr CreateRoundRectRgn(int left, int top, int right, int bottom, int width, int height);
 
         private static (string description, decimal amount, string category) ParseExpenseInput(string input)
         {
@@ -120,9 +213,7 @@ namespace ExpenseManager.Views
             string numberStr = match.Groups[2].Value;
             string unit = match.Groups[3].Value;
             if (!decimal.TryParse(numberStr, out _))
-            {
                 return ("", 0, "Khác");
-            }
 
             decimal amount = ParseAmount(numberStr, unit);
             string category = CategorizeExpense(description);
