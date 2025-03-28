@@ -38,7 +38,7 @@
             panel1 = new Panel();
             pbLogo = new PictureBox();
             panel2 = new Panel();
-            linkLabel1 = new LinkLabel();
+            llbForgotPassword = new LinkLabel();
             chkRememberMe = new CheckBox();
             panel3 = new Panel();
             btnLogin = new Button();
@@ -148,7 +148,7 @@
             // 
             // panel2
             // 
-            panel2.Controls.Add(linkLabel1);
+            panel2.Controls.Add(llbForgotPassword);
             panel2.Controls.Add(chkRememberMe);
             panel2.Dock = DockStyle.Top;
             panel2.Location = new Point(0, 392);
@@ -156,17 +156,17 @@
             panel2.Size = new Size(406, 44);
             panel2.TabIndex = 2;
             // 
-            // linkLabel1
+            // llbForgotPassword
             // 
-            linkLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            linkLabel1.AutoSize = true;
-            linkLabel1.Location = new Point(242, 11);
-            linkLabel1.Name = "linkLabel1";
-            linkLabel1.Size = new Size(116, 20);
-            linkLabel1.TabIndex = 1;
-            linkLabel1.TabStop = true;
-            linkLabel1.Text = "Quên mật khẩu?";
-            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
+            llbForgotPassword.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            llbForgotPassword.AutoSize = true;
+            llbForgotPassword.Location = new Point(242, 11);
+            llbForgotPassword.Name = "llbForgotPassword";
+            llbForgotPassword.Size = new Size(116, 20);
+            llbForgotPassword.TabIndex = 1;
+            llbForgotPassword.TabStop = true;
+            llbForgotPassword.Text = "Quên mật khẩu?";
+            llbForgotPassword.LinkClicked += linkLabel1_LinkClicked;
             // 
             // chkRememberMe
             // 
@@ -244,7 +244,7 @@
         private CheckBox chkRememberMe;
         private TextBox txtPassword;
         private Label lblPassword;
-        private LinkLabel linkLabel1;
+        private LinkLabel llbForgotPassword;
         private Button btnLogin;
     }
 }
