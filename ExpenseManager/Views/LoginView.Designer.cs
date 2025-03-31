@@ -166,7 +166,7 @@
             llbForgotPassword.TabIndex = 1;
             llbForgotPassword.TabStop = true;
             llbForgotPassword.Text = "Quên mật khẩu?";
-            llbForgotPassword.LinkClicked += linkLabel1_LinkClicked;
+            llbForgotPassword.LinkClicked += LlbForgotPassword_LinkClicked;
             // 
             // chkRememberMe
             // 

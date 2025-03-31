@@ -45,7 +45,7 @@ namespace ExpenseManager
 
         private static async Task InitializeIdentityData(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            string[] roleNames = { "Admin", "User" };
+            string[] roleNames = ["Admin", "User"];
             foreach (var roleName in roleNames)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))

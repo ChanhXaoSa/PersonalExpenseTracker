@@ -51,8 +51,7 @@ namespace ExpenseManager.Views
                 return;
             }
 
-            bool loginSuccess = false;
-            loginSuccess = await model.ValidateUserAsync(username, txtPassword.Text);
+            bool loginSuccess = await model.ValidateUserAsync(username, txtPassword.Text);
 
             if (loginSuccess)
             {
@@ -108,12 +107,12 @@ namespace ExpenseManager.Views
 
         private class LoginToken
         {
-            public string UserId { get; set; }
-            public string Username { get; set; }
+            public required string UserId { get; set; }
+            public required string Username { get; set; }
             public DateTime Expiry { get; set; }
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void LlbForgotPassword_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
 
         }
