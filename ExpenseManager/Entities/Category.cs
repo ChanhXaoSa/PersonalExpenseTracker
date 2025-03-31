@@ -1,5 +1,5 @@
 ﻿using ExpenseManager.Common;
-using ExpenseManager.Models;
+using ExpenseManager.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

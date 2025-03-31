@@ -3,7 +3,7 @@ using ExpenseManager.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
-using ExpenseManager.Entities;
+using ExpenseManager.Identity;
 
 namespace ExpenseManager
 {

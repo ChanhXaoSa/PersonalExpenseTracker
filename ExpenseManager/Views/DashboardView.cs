@@ -1,4 +1,5 @@
 ﻿using ExpenseManager.Entities;
+using ExpenseManager.Identity;
 using ExpenseManager.Models;
 using ExpenseManager.Presenters;
 using Microsoft.AspNetCore.Identity;

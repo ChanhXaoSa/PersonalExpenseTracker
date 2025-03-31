@@ -1,4 +1,6 @@
 ﻿using ExpenseManager.Common;
+using ExpenseManager.Entities;
+using ExpenseManager.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

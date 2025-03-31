@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using ExpenseManager.Entities;
+using ExpenseManager.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
@@ -43,7 +45,7 @@ namespace ExpenseManager.Models
         public void DeleteExpense(Guid id, string userId)
         {
             var expense = dbContext.Expenses
-                .FirstOrDefault(e => e.Id == id && e.UserId == userId); ;
+                .FirstOrDefault(e => e.Id == id && e.UserId == userId);
             if(expense != null)
             {
                 dbContext.Expenses.Remove(expense);
