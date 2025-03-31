@@ -20,6 +20,7 @@ namespace ExpenseManager.Views
     public partial class DashboardView : Form
     {
         private readonly ExpensePresenter presenter;
+        private readonly IdentityService identity;
         private readonly ExpenseModel model;
         private readonly UserManager<ApplicationUser> userManager;
         private bool isLoggingOut = false;
@@ -31,7 +32,9 @@ namespace ExpenseManager.Views
 
             this.userManager = userManager;
 
-            model = new ExpenseModel(userManager);
+            identity = new IdentityService(userManager);
+
+            model = new ExpenseModel();
 
             lblUsername.Text = $"Xin chào, {username}";
 

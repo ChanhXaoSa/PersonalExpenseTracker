@@ -12,14 +12,14 @@ namespace ExpenseManager.Views
 {
     public partial class LoginView : Form
     {
-        private readonly ExpenseModel model;
+        private readonly IdentityService model;
         private readonly UserManager<ApplicationUser> userManager;
         private const string TokenFilePath = "login_token.json";
 
         public LoginView(UserManager<ApplicationUser> userManager)
         {
             this.userManager = userManager;
-            this.model = new ExpenseModel(userManager);
+            this.model = new IdentityService(userManager);
             InitializeComponent();
             SetupUI();
         }

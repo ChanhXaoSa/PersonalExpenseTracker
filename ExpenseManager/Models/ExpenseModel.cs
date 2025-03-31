@@ -14,12 +14,10 @@ namespace ExpenseManager.Models
     public class ExpenseModel
     {
         private readonly ExpenseDbContext dbContext;
-        private readonly UserManager<ApplicationUser> userManager;
 
-        public ExpenseModel(UserManager<ApplicationUser> userManager)
+        public ExpenseModel()
         {
             dbContext = new ExpenseDbContext();
-            this.userManager = userManager;
             dbContext.Database.EnsureCreated();
         }
 
@@ -73,26 +71,6 @@ namespace ExpenseManager.Models
                 .Where(e => e.UserId == userId && !e.IsDeleted)
                 .GroupBy(e => e.Category)
                 .ToDictionary(g => g.Key, g => g.Sum(e => e.Amount));
-        }
-
-        public async Task<bool> ValidateUserAsync(string username, string password)
-        {
-            var user = await userManager.FindByNameAsync(username);
-            if (user != null)
-            {
-                return await userManager.CheckPasswordAsync(user, password);
-            }
-            return false;
-        }
-
-        public async Task<bool> ValidatePinAsync(string username, string pin)
-        {
-            var user = await userManager.FindByNameAsync(username);
-            if (user is ApplicationUser appUser && appUser != null)
-            {
-                return appUser.Pin == pin;
-            }
-            return false;
         }
     }
 }
