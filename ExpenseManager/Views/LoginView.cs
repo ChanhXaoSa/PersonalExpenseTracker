@@ -99,7 +99,7 @@ namespace ExpenseManager.Views
                         return true;
                     }
                 }
-            }   
+            }
             return false;
         }
 
@@ -121,6 +121,11 @@ namespace ExpenseManager.Views
         private void LoginView_Load(object sender, EventArgs e)
         {
             //CheckSavedLogin();
+        }
+
+        private void LlbRegister_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
         }
     }
 }

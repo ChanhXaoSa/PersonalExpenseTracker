@@ -41,6 +41,8 @@
             llbForgotPassword = new LinkLabel();
             chkRememberMe = new CheckBox();
             panel3 = new Panel();
+            label1 = new Label();
+            llbRegister = new LinkLabel();
             btnLogin = new Button();
             tableLayoutPanel1.SuspendLayout();
             panel5.SuspendLayout();
@@ -182,12 +184,38 @@
             // 
             // panel3
             // 
+            panel3.Controls.Add(label1);
+            panel3.Controls.Add(llbRegister);
             panel3.Controls.Add(btnLogin);
             panel3.Dock = DockStyle.Bottom;
-            panel3.Location = new Point(0, 441);
+            panel3.Location = new Point(0, 464);
             panel3.Name = "panel3";
-            panel3.Size = new Size(406, 87);
+            panel3.Size = new Size(406, 104);
             panel3.TabIndex = 3;
+            // 
+            // label1
+            // 
+            label1.Anchor = AnchorStyles.Bottom;
+            label1.AutoSize = true;
+            label1.Location = new Point(92, 67);
+            label1.Name = "label1";
+            label1.Size = new Size(139, 20);
+            label1.TabIndex = 2;
+            label1.Text = "Chưa có tài khoản ?";
+            label1.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // llbRegister
+            // 
+            llbRegister.Anchor = AnchorStyles.Bottom;
+            llbRegister.AutoSize = true;
+            llbRegister.Location = new Point(228, 67);
+            llbRegister.Name = "llbRegister";
+            llbRegister.Size = new Size(63, 20);
+            llbRegister.TabIndex = 1;
+            llbRegister.TabStop = true;
+            llbRegister.Text = "Đăng ký";
+            llbRegister.TextAlign = ContentAlignment.MiddleCenter;
+            llbRegister.LinkClicked += LlbRegister_LinkClicked;
             // 
             // btnLogin
             // 
@@ -197,7 +225,7 @@
             btnLogin.FlatStyle = FlatStyle.Flat;
             btnLogin.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 163);
             btnLogin.ForeColor = Color.White;
-            btnLogin.Location = new Point(52, 16);
+            btnLogin.Location = new Point(52, 12);
             btnLogin.Margin = new Padding(0);
             btnLogin.Name = "btnLogin";
             btnLogin.Size = new Size(306, 42);
@@ -210,7 +238,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(406, 528);
+            ClientSize = new Size(406, 568);
             Controls.Add(panel3);
             Controls.Add(panel2);
             Controls.Add(tableLayoutPanel1);
@@ -228,6 +256,7 @@
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             panel3.ResumeLayout(false);
+            panel3.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -247,5 +276,7 @@
         private Label lblPassword;
         private LinkLabel llbForgotPassword;
         private Button btnLogin;
+        private LinkLabel llbRegister;
+        private Label label1;
     }
 }
