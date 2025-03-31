@@ -118,6 +118,17 @@ namespace ExpenseManager.Views
 
         }
 
+        private void SwitchToRegister()
+        {
+            var registerView = new RegisterView(userManager);
+            registerView.FormClosed += (s, e) =>
+            {
+                this.Show();
+            };
+            this.Hide();
+            registerView.Show();
+        }
+
         private void LoginView_Load(object sender, EventArgs e)
         {
             //CheckSavedLogin();
@@ -125,7 +136,7 @@ namespace ExpenseManager.Views
 
         private void LlbRegister_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-
+            SwitchToRegister();
         }
     }
 }

@@ -37,24 +37,24 @@
             panel4 = new Panel();
             txtEmail = new TextBox();
             lblUsername = new Label();
+            panel2 = new Panel();
+            txtPassword = new TextBox();
+            label2 = new Label();
+            panel6 = new Panel();
+            txtConfirmPassword = new TextBox();
+            label3 = new Label();
             panel3 = new Panel();
             label1 = new Label();
             llbLogin = new LinkLabel();
             btnRegister = new Button();
-            panel2 = new Panel();
-            panel6 = new Panel();
-            txtPassword = new TextBox();
-            label2 = new Label();
-            txtConfirmPassword = new TextBox();
-            label3 = new Label();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLogo).BeginInit();
             tableLayoutPanel1.SuspendLayout();
             panel5.SuspendLayout();
             panel4.SuspendLayout();
-            panel3.SuspendLayout();
             panel2.SuspendLayout();
             panel6.SuspendLayout();
+            panel3.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
@@ -113,7 +113,6 @@
             txtUsername.Name = "txtUsername";
             txtUsername.Size = new Size(370, 27);
             txtUsername.TabIndex = 3;
-            txtUsername.UseSystemPasswordChar = true;
             // 
             // lblPassword
             // 
@@ -155,6 +154,68 @@
             lblUsername.Size = new Size(45, 20);
             lblUsername.TabIndex = 0;
             lblUsername.Text = "Email";
+            // 
+            // panel2
+            // 
+            panel2.Controls.Add(txtPassword);
+            panel2.Controls.Add(label2);
+            panel2.Dock = DockStyle.Fill;
+            panel2.Location = new Point(3, 141);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(426, 63);
+            panel2.TabIndex = 2;
+            // 
+            // txtPassword
+            // 
+            txtPassword.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtPassword.Cursor = Cursors.IBeam;
+            txtPassword.Location = new Point(30, 29);
+            txtPassword.Name = "txtPassword";
+            txtPassword.Size = new Size(370, 27);
+            txtPassword.TabIndex = 3;
+            txtPassword.UseSystemPasswordChar = true;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point, 163);
+            label2.ForeColor = SystemColors.ControlDarkDark;
+            label2.Location = new Point(26, 6);
+            label2.Name = "label2";
+            label2.Size = new Size(69, 20);
+            label2.TabIndex = 2;
+            label2.Text = "Mật khẩu";
+            // 
+            // panel6
+            // 
+            panel6.Controls.Add(txtConfirmPassword);
+            panel6.Controls.Add(label3);
+            panel6.Dock = DockStyle.Fill;
+            panel6.Location = new Point(3, 210);
+            panel6.Name = "panel6";
+            panel6.Size = new Size(426, 65);
+            panel6.TabIndex = 3;
+            // 
+            // txtConfirmPassword
+            // 
+            txtConfirmPassword.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtConfirmPassword.Cursor = Cursors.IBeam;
+            txtConfirmPassword.Location = new Point(30, 30);
+            txtConfirmPassword.Name = "txtConfirmPassword";
+            txtConfirmPassword.Size = new Size(370, 27);
+            txtConfirmPassword.TabIndex = 3;
+            txtConfirmPassword.UseSystemPasswordChar = true;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point, 163);
+            label3.ForeColor = SystemColors.ControlDarkDark;
+            label3.Location = new Point(26, 7);
+            label3.Name = "label3";
+            label3.Size = new Size(129, 20);
+            label3.TabIndex = 2;
+            label3.Text = "Nhập lại mật khẩu";
             // 
             // panel3
             // 
@@ -206,66 +267,6 @@
             btnRegister.Text = "Đăng ký";
             btnRegister.UseVisualStyleBackColor = false;
             // 
-            // panel2
-            // 
-            panel2.Controls.Add(txtPassword);
-            panel2.Controls.Add(label2);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(3, 141);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(426, 63);
-            panel2.TabIndex = 2;
-            // 
-            // panel6
-            // 
-            panel6.Controls.Add(txtConfirmPassword);
-            panel6.Controls.Add(label3);
-            panel6.Dock = DockStyle.Fill;
-            panel6.Location = new Point(3, 210);
-            panel6.Name = "panel6";
-            panel6.Size = new Size(426, 65);
-            panel6.TabIndex = 3;
-            // 
-            // txtPassword
-            // 
-            txtPassword.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtPassword.Cursor = Cursors.IBeam;
-            txtPassword.Location = new Point(30, 29);
-            txtPassword.Name = "txtPassword";
-            txtPassword.Size = new Size(370, 27);
-            txtPassword.TabIndex = 3;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point, 163);
-            label2.ForeColor = SystemColors.ControlDarkDark;
-            label2.Location = new Point(26, 6);
-            label2.Name = "label2";
-            label2.Size = new Size(69, 20);
-            label2.TabIndex = 2;
-            label2.Text = "Mật khẩu";
-            // 
-            // txtConfirmPassword
-            // 
-            txtConfirmPassword.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtConfirmPassword.Cursor = Cursors.IBeam;
-            txtConfirmPassword.Location = new Point(30, 30);
-            txtConfirmPassword.Name = "txtConfirmPassword";
-            txtConfirmPassword.Size = new Size(370, 27);
-            txtConfirmPassword.TabIndex = 3;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point, 163);
-            label3.ForeColor = SystemColors.ControlDarkDark;
-            label3.Location = new Point(26, 7);
-            label3.Name = "label3";
-            label3.Size = new Size(129, 20);
-            label3.TabIndex = 2;
-            label3.Text = "Nhập lại mật khẩu";
-            // 
             // RegisterView
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -283,12 +284,12 @@
             panel5.PerformLayout();
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
-            panel3.ResumeLayout(false);
-            panel3.PerformLayout();
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             panel6.ResumeLayout(false);
             panel6.PerformLayout();
+            panel3.ResumeLayout(false);
+            panel3.PerformLayout();
             ResumeLayout(false);
         }
 

@@ -18,6 +18,11 @@ namespace ExpenseManager.Identity
             {
                 return await userManager.CheckPasswordAsync(user, password);
             }
+            user = await userManager.FindByEmailAsync(username);
+            if (user != null)
+            {
+                return await userManager.CheckPasswordAsync(user, password);
+            }
             return false;
         }
 
