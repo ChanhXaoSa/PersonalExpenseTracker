@@ -4,6 +4,7 @@ using ExpenseManager.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpenseManager.Migrations
 {
     [DbContext(typeof(ExpenseDbContext))]
-    partial class ExpenseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250331032100_AddMoreTable")]
+    partial class AddMoreTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,17 +95,17 @@ namespace ExpenseManager.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "6af0c7f1-68b0-43bc-a2e0-a12e43bed030",
+                            Id = "0aae5446-e2e8-4e19-a97c-f3decb97368a",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "52e91f6a-460a-48d5-bc21-77d16aaf6f48",
+                            ConcurrencyStamp = "7263d23d-71eb-4c8b-9da0-3326dd3283ff",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEtLcHeuc64zFxb2aYz23YoLWjBNN1xX2z3G3XenPHmCixRfaOU68RJIQRYrK5Egvg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIdlLchHmtmR2X4QxFlX4lTrG7LuHa4dEMR5tlttqDzkuOKDUqKognh3fF4LiOIItg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2aff2945-0107-46a9-9266-000a4eff4a1d",
+                            SecurityStamp = "ac5d6e82-11b7-45ea-bdea-180e3717c27a",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
@@ -145,13 +148,9 @@ namespace ExpenseManager.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Budgets");
                 });
@@ -187,11 +186,9 @@ namespace ExpenseManager.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Categories");
                 });
@@ -284,11 +281,9 @@ namespace ExpenseManager.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Goals");
                 });
@@ -330,11 +325,9 @@ namespace ExpenseManager.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Incomes");
                 });
@@ -381,11 +374,9 @@ namespace ExpenseManager.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("RecurringTransactions");
                 });
@@ -419,13 +410,13 @@ namespace ExpenseManager.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "980bb49f-7950-4775-8bb4-2396f9287906",
+                            Id = "de322605-3c3a-44af-9c47-680bd2000765",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "922a4904-85e7-4806-a135-27c41f03204a",
+                            Id = "cbfcef7e-09e0-49cf-816f-ec823b09540f",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -537,34 +528,6 @@ namespace ExpenseManager.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ExpenseManager.Models.Budget", b =>
-                {
-                    b.HasOne("ExpenseManager.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ExpenseManager.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Category", b =>
-                {
-                    b.HasOne("ExpenseManager.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("ApplicationUser");
-                });
-
             modelBuilder.Entity("ExpenseManager.Models.Expense", b =>
                 {
                     b.HasOne("ExpenseManager.Models.ApplicationUser", null)
@@ -572,39 +535,6 @@ namespace ExpenseManager.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Goal", b =>
-                {
-                    b.HasOne("ExpenseManager.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Income", b =>
-                {
-                    b.HasOne("ExpenseManager.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.RecurringTransaction", b =>
-                {
-                    b.HasOne("ExpenseManager.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -13,6 +13,11 @@ namespace ExpenseManager.Models
     public class ExpenseDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<Budget> Budgets { get; set; }
+        public DbSet<RecurringTransaction> RecurringTransactions { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Income> Incomes { get; set; }
+        public DbSet<Goal> Goals { get; set; }
 
         private readonly string connectionString;
 
