@@ -96,9 +96,16 @@ namespace ExpenseManager
             ShowLoginView();
         }
 
-        private void ShowLoginView()
+        private async void ShowLoginView()
         {
             var loginView = new LoginView(userManager);
+
+            bool isLoggedIn = await loginView.CheckSavedLoginAsync();
+            if (isLoggedIn) 
+            {
+                ShowDashboardView(loginView.Username, loginView.UserId!);
+                return;
+            }
             loginView.FormClosed += (s, e) =>
             {
                 if (loginView.DialogResult == DialogResult.OK)

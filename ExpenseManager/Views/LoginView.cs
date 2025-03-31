@@ -21,7 +21,6 @@ namespace ExpenseManager.Views
             this.model = new ExpenseModel(userManager);
             InitializeComponent();
             SetupUI();
-            CheckSavedLogin();
         }
 
         private void SetupUI()
@@ -81,7 +80,7 @@ namespace ExpenseManager.Views
             }
         }
 
-        private async void CheckSavedLogin()
+        public async Task<bool> CheckSavedLoginAsync()
         {
             if (File.Exists(TokenFilePath))
             {
@@ -96,10 +95,11 @@ namespace ExpenseManager.Views
                     {
                         txtUsername.Text = tokenData.Username;
                         DialogResult = DialogResult.OK;
-                        Close();
+                        return true;
                     }
                 }
-            }
+            }   
+            return false;
         }
 
         public string Username => txtUsername.Text ?? string.Empty;
@@ -115,6 +115,11 @@ namespace ExpenseManager.Views
         private void LlbForgotPassword_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
 
+        }
+
+        private void LoginView_Load(object sender, EventArgs e)
+        {
+            //CheckSavedLogin();
         }
     }
 }

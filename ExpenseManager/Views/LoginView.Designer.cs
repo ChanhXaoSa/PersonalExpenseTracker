@@ -217,6 +217,7 @@
             Controls.Add(panel1);
             Name = "LoginView";
             Text = "LoginView";
+            Load += LoginView_Load;
             tableLayoutPanel1.ResumeLayout(false);
             panel5.ResumeLayout(false);
             panel5.PerformLayout();

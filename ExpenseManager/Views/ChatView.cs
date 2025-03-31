@@ -3,6 +3,7 @@ using ExpenseManager.Presenters;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -149,17 +150,13 @@ namespace ExpenseManager.Views
             {
                 if (isUser)
                 {
-                    using (var ms = new System.IO.MemoryStream(Resources.user))
-                    {
-                        icon.Image = Image.FromStream(ms);
-                    }
+                    using var ms = new System.IO.MemoryStream(Resources.user);
+                    icon.Image = Image.FromStream(ms);
                 }
                 else
                 {
-                    using (var ms = new System.IO.MemoryStream(Resources.bot))
-                    {
-                        icon.Image = Image.FromStream(ms);
-                    }
+                    using var ms = new System.IO.MemoryStream(Resources.bot);
+                    icon.Image = Image.FromStream(ms);
                 }
             }
             catch (Exception)
@@ -200,8 +197,8 @@ namespace ExpenseManager.Views
             chatPanel.Controls.Add(messagePanel);
         }
 
-        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-        private static extern IntPtr CreateRoundRectRgn(int left, int top, int right, int bottom, int width, int height);
+        [LibraryImport("gdi32.dll")]
+        private static partial IntPtr CreateRoundRectRgn(int left, int top, int right, int bottom, int width, int height);
 
         private static (string description, decimal amount, string category) ParseExpenseInput(string input)
         {
@@ -210,17 +207,76 @@ namespace ExpenseManager.Views
                 return ("", 0, "Khác");
 
             string description = match.Groups[1].Value.Trim();
-            string numberStr = match.Groups[2].Value;
-            string unit = match.Groups[3].Value;
-            if (!decimal.TryParse(numberStr, out _))
+            string amountPart = match.Groups[2].Value;
+
+            decimal amount = ParseComplexAmount(amountPart);
+            if (amount <= 0)
                 return ("", 0, "Khác");
 
-            decimal amount = ParseAmount(numberStr, unit);
             string category = CategorizeExpense(description);
             if (string.IsNullOrEmpty(description))
                 description = category;
 
             return (description, amount, category);
+        }
+
+        private static decimal ParseComplexAmount(string amountText)
+        {
+            amountText = amountText.Replace(',', '.');
+
+            var simpleMatch = ExpenseAmountRegex().Match(amountText);
+            if (simpleMatch.Success)
+            {
+                string numberStr = simpleMatch.Groups[1].Value;
+                string unit = simpleMatch.Groups[2].Value.ToLower();
+
+                if (decimal.TryParse(numberStr, out decimal amount))
+                    return ConvertToVND(amount, unit);
+            }
+
+            var mixedMatch = ComplexAmountRegex().Match(amountText);
+            if (mixedMatch.Success)
+            {
+                string wholePart = mixedMatch.Groups[1].Value;
+                string unit = mixedMatch.Groups[2].Value.ToLower();
+                string fractionalPart = mixedMatch.Groups[3].Value;
+
+                if (decimal.TryParse(wholePart, out decimal whole) && decimal.TryParse(fractionalPart, out decimal fraction))
+                {
+                    decimal divider = (decimal)Math.Pow(10, fractionalPart.Length);
+                    decimal combined = whole + (fraction / divider);
+                    return ConvertToVND(combined, unit);
+                }
+            }
+
+            var wordSeparatedMatch = WordSeparatedAmountRegex().Match(amountText);
+            if (wordSeparatedMatch.Success)
+            {
+                string wholePart = wordSeparatedMatch.Groups[1].Value;
+                string unit = wordSeparatedMatch.Groups[2].Value.ToLower();
+                string fractionalPart = wordSeparatedMatch.Groups[3].Value;
+
+                if (decimal.TryParse(wholePart, out decimal whole) && decimal.TryParse(fractionalPart, out decimal fraction))
+                {
+                    decimal divider = (decimal)Math.Pow(10, fractionalPart.Length);
+                    decimal combined = whole + (fraction / divider);
+                    return ConvertToVND(combined, unit);
+                }
+            }
+
+            return 0;
+        }
+
+        private static decimal ConvertToVND(decimal amount, string unit)
+        {
+            return unit.ToLower() switch
+            {
+                "k" or "nghìn" => amount * 1000,
+                "m" or "triệu" => amount * 1000000,
+                "t" or "tỉ" or "tỷ" => amount * 1000000000,
+                "" or "vnd" or "vnđ" or "đ" or "đồng" => amount,
+                _ => 0,
+            };
         }
 
         private static decimal ParseAmount(string numberStr, string unit)
@@ -248,10 +304,19 @@ namespace ExpenseManager.Views
             return "Khác";
         }
 
-        [GeneratedRegex(@"xóa\s+(\d*\.?\d+)([mk]|vnd|vnđ|đ|đồng|nghìn|triệu)?$", RegexOptions.IgnoreCase, "en-US")]
+        [GeneratedRegex(@"^(.*?)?\s*(\d+(?:[.,]\d+)?(?:[kmtỉtỷ]\d*)?|\d+\s+(?:nghìn|triệu|tỉ|tỷ)\s+\d+)([kmtỉtỷ]|vnd|vnđ|đ|đồng|nghìn|triệu|tỉ|tỷ)?$", RegexOptions.IgnoreCase, "en-US")]
+        private static partial Regex ExpenseInputRegex();
+
+        [GeneratedRegex(@"xóa\s+(\d+(?:[.,]\d+)?(?:[kmtỉtỷ]\d*)?|\d+\s+(?:nghìn|triệu|tỉ|tỷ)\s+\d+)([kmtỉtỷ]|vnd|vnđ|đ|đồng|nghìn|triệu|tỉ|tỷ)?$", RegexOptions.IgnoreCase, "en-US")]
         private static partial Regex DeleteExpenseRegex();
 
-        [GeneratedRegex(@"^(.*?)?\s*(\d*\.?\d+)([mk]|vnd|vnđ|đ|đồng|nghìn|triệu)?$", RegexOptions.IgnoreCase, "en-US")]
-        private static partial Regex ExpenseInputRegex();
+        [GeneratedRegex(@"^(\d*\.?\d+)([kmtỉtỷ]|vnd|vnđ|đ|đồng|nghìn|triệu|tỉ|tỷ)?$", RegexOptions.IgnoreCase, "en-US")]
+        private static partial Regex ExpenseAmountRegex();
+
+        [GeneratedRegex(@"^(\d+)([km])(\d+)$", RegexOptions.IgnoreCase, "en-US")]
+        private static partial Regex ComplexAmountRegex();
+
+        [GeneratedRegex(@"^(\d+)\s+(tỉ|tỷ|triệu|nghìn|trăm)\s+(\d+)$", RegexOptions.IgnoreCase, "en-US")]
+        private static partial Regex WordSeparatedAmountRegex();
     }
 }
