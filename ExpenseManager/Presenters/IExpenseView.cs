@@ -1,4 +1,4 @@
-﻿using ExpenseManager.Models;
+﻿using ExpenseManager.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

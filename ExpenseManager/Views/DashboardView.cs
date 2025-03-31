@@ -1,4 +1,5 @@
-﻿using ExpenseManager.Models;
+﻿using ExpenseManager.Entities;
+using ExpenseManager.Models;
 using ExpenseManager.Presenters;
 using Microsoft.AspNetCore.Identity;
 using ScottPlot;

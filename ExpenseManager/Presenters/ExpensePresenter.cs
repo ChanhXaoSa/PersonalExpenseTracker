@@ -1,4 +1,5 @@
-﻿using ExpenseManager.Models;
+﻿using ExpenseManager.Entities;
+using ExpenseManager.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

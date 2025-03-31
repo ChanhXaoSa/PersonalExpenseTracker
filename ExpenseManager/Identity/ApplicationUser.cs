@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExpenseManager.Models
+namespace ExpenseManager.Identity
 {
     public class ApplicationUser : IdentityUser
     {

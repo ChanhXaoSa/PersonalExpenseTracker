@@ -1,4 +1,5 @@
 ﻿using ExpenseManager.Common;
+using ExpenseManager.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExpenseManager.Models
+namespace ExpenseManager.Entities
 {
     public class Category : BaseAuditableEntity
     {
