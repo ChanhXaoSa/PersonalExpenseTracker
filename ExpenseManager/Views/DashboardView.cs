@@ -19,11 +19,11 @@ namespace ExpenseManager.Views
     {
         private readonly ExpensePresenter presenter;
         private readonly ExpenseModel model;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private bool isLoggingOut = false;
         private Dictionary<string, decimal> _expensesByCategory = [];
         private Dictionary<DateTime, decimal> _expensesByMonth = [];
-        public DashboardView(string username, string userId, UserManager<IdentityUser> userManager)
+        public DashboardView(string username, string userId, UserManager<ApplicationUser> userManager)
         {
             InitializeComponent();
 

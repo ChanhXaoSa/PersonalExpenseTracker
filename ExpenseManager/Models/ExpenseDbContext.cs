@@ -29,13 +29,13 @@ namespace ExpenseManager.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if(!optionsBuilder.IsConfigured)
+            if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseSqlServer(connectionString)
                     .EnableSensitiveDataLogging()
                     .LogTo(Console.WriteLine);
             }
-        }   
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -61,16 +61,15 @@ namespace ExpenseManager.Models
                 entity.Property(e => e.Amount).HasColumnType("decimal(18,2)").IsRequired();
                 entity.Property(e => e.Date).IsRequired();
                 entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
-                entity.HasOne<IdentityUser>()
+                entity.HasOne<ApplicationUser>()
                       .WithMany()
                       .HasForeignKey(e => e.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            var hasher = new PasswordHasher<IdentityUser>();
-            var adminUser = new IdentityUser
+            var hasher = new PasswordHasher<ApplicationUser>();
+            var adminUser = new ApplicationUser
             {
-                Id = "00000000-0000-0000-0000-000000000001",
                 UserName = "admin",
                 NormalizedUserName = "ADMIN",
                 Email = "admin@example.com",
@@ -79,7 +78,12 @@ namespace ExpenseManager.Models
                 LockoutEnabled = false
             };
             adminUser.PasswordHash = hasher.HashPassword(adminUser, "123456");
-            modelBuilder.Entity<IdentityUser>().HasData(adminUser);
+            modelBuilder.Entity<ApplicationUser>().HasData(adminUser);
+
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole { Name = "User", NormalizedName = "USER" }
+            );
         }
     }
 }

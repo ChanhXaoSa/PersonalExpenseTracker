@@ -12,9 +12,9 @@ namespace ExpenseManager.Models
     public class ExpenseModel
     {
         private readonly ExpenseDbContext dbContext;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public ExpenseModel(UserManager<IdentityUser> userManager)
+        public ExpenseModel(UserManager<ApplicationUser> userManager)
         {
             dbContext = new ExpenseDbContext();
             this.userManager = userManager;

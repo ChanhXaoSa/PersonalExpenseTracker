@@ -12,10 +12,10 @@ namespace ExpenseManager.Views
     public partial class LoginView : Form
     {
         private readonly ExpenseModel model;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private const string TokenFilePath = "login_token.json";
 
-        public LoginView(UserManager<IdentityUser> userManager)
+        public LoginView(UserManager<ApplicationUser> userManager)
         {
             this.userManager = userManager;
             this.model = new ExpenseModel(userManager);
